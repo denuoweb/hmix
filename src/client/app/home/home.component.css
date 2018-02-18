@@ -1,13 +1,32 @@
-:host {
+.app-panel {
+  height: 100vh;
   display: block;
-  padding: 0 16px;
+  position: relative;
+  overflow-x: hidden;
 }
 
-input {
-  width: 250px;
+.sidebar-panel {
+  float: left;
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
-ul {
-  list-style-type: none;
-  padding: 0 0 0 8px;
+.editor-panel {
+  float: right;
+}
+
+#sidebar-divider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  cursor: col-resize;
+  width: 4px;
+  background-color: transparent;
+  z-index: 5;
+}
+
+sd-sidebar,
+sd-editor {
+  height: 100%;
+  width: 100%;
 }

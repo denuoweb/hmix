@@ -1,0 +1,37 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+.child-items {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.item-name {
+  cursor: pointer;
+  height: 20px;
+  line-height: 20px;
+  font-size: 14px;
+  color: #E2E2E2;
+
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-name:hover {
+  color: #2e9ad0;
+}
+
+.expansion-caret {
+  position: absolute;
+  left: -14px;
+  color: white;
+}
+
+.expansion-caret i {
+  position: relative;
+  top: 1px;
+}

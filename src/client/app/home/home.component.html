@@ -1,10 +1,7 @@
-<p>Howdy! Here's a list of awesome computer scientists. Do you know any others? Add to the list yourself.</p>
-
-<form (submit)="addName()">
-  <input [(ngModel)]="newName" name="newName" placeholder="Awesome Computer Scientist">
-  <button type="submit">Add</button>
-</form>
-
-<ul>
-  <li *ngFor="let name of names">{{ name }}</li>
-</ul>
+<div class="app-panel sidebar-panel" [style.width.px]="sidebarWidth">
+  <sd-sidebar></sd-sidebar>
+</div>
+<div class="app-panel editor-panel" [style.width.px]="editorWidth">
+  <div id="sidebar-divider" (mousedown)="resizeSidebar($event)"></div>
+  <sd-editor></sd-editor>
+</div>

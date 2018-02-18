@@ -1,0 +1,14 @@
+<div id="file-tab-container">
+  <div *ngFor="let file of openFiles" class="file-tab" [class.selected]="isSelected(file)" (mousedown)="onTabClick($event, file)">
+    <span class="file-name noselect">{{ file.name }}</span>
+    <span class="close-file-btn">
+      <i (click)="closeFile(file)" class="fa fa-times"></i>
+    </span>
+    <span class="close-file-btn not-saved-indicator">
+      <i *ngIf="!file.saved" class="fa fa-circle"></i>
+    </span>
+  </div>
+</div>
+
+<!-- Ace container -->
+<div id="ace-container"></div>

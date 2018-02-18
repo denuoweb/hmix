@@ -3,9 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-import { ToolbarComponent } from './toolbar/toolbar.component';
-import { NavbarComponent } from './navbar/navbar.component';
-import { NameListService } from './name-list/name-list.service';
+// Components
+import { EditorComponent } from './components/editor/editor.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { FileTreeComponent } from './components/sidebar/file-tree/file-tree.component';
+import { TreeNodeComponent } from './components/sidebar/tree-node/tree-node.component';
+
+// Services
+import { StorageService } from './services/storage/storage.service';
+import { FileService } from './services/file/file.service';
+import { EditorService } from './services/editor/editor.service';
 
 /**
  * Do not specify providers for modules that might be imported by a lazy loaded module.
@@ -13,15 +20,15 @@ import { NameListService } from './name-list/name-list.service';
 
 @NgModule({
   imports: [CommonModule, RouterModule],
-  declarations: [ToolbarComponent, NavbarComponent],
-  exports: [ToolbarComponent, NavbarComponent,
+  declarations: [SidebarComponent, EditorComponent, FileTreeComponent, TreeNodeComponent],
+  exports: [SidebarComponent, EditorComponent, FileTreeComponent, TreeNodeComponent,
     CommonModule, FormsModule, RouterModule]
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders {
     return {
       ngModule: SharedModule,
-      providers: [NameListService]
+      providers: [StorageService, FileService, EditorService]
     };
   }
 }

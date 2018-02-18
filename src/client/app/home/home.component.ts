@@ -1,9 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { NameListService } from '../shared/name-list/name-list.service';
+import { Component, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
+import { StorageService } from '../shared/services/storage/storage.service';
 
-/**
- * This class represents the lazy loaded HomeComponent.
- */
 @Component({
   moduleId: module.id,
   selector: 'sd-home',
@@ -11,46 +8,67 @@ import { NameListService } from '../shared/name-list/name-list.service';
   styleUrls: ['home.component.css'],
 })
 export class HomeComponent implements OnInit {
+  private sidebarWidthKey = 'qmix-sidebar-width';
+  private defaultSidebarWidth = 200;
+  private minSidebarWidth = 150;
+  private _sidebarWidth: number;
+  private isResizing: boolean;
+  private lastX: number;
 
-  newName = '';
-  errorMessage: string;
-  names: any[] = [];
+  constructor(private changeDetector: ChangeDetectorRef,
+              private storageService: StorageService) { }
 
-  /**
-   * Creates an instance of the HomeComponent with the injected
-   * NameListService.
-   *
-   * @param {NameListService} nameListService - The injected NameListService.
-   */
-  constructor(public nameListService: NameListService) {}
-
-  /**
-   * Get the names OnInit
-   */
   ngOnInit() {
-    this.getNames();
+    this.sidebarWidth = this.storageService.get(this.sidebarWidthKey) || this.defaultSidebarWidth;
   }
 
-  /**
-   * Handle the nameListService observable
-   */
-  getNames() {
-    this.nameListService.get()
-      .subscribe(
-        names => this.names = names,
-        error => this.errorMessage = <any>error
-      );
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent): void {
+    if (!this.isResizing) return;
+    const currentX = event.clientX
+    
+    // Calculate a new width
+    if (currentX > 100) {
+      const newWidth = this.sidebarWidth + currentX - this.lastX;
+      this.sidebarWidth = Math.min(Math.max(newWidth, this.minSidebarWidth), this.maxSidebarWidth);
+    } else {
+      this.sidebarWidth = 0;
+    }
+    this.lastX = currentX;
+
+    // Force detect changes to avoid https://github.com/angular/angular/issues/6005
+    this.changeDetector.detectChanges();
+  }
+  
+  @HostListener('document:mouseup', ['$event'])
+  onMouseUp(event: MouseEvent) {
+    this.isResizing = false;
   }
 
-  /**
-   * Pushes a new name onto the names array
-   * @return {boolean} false to prevent default form submit behavior to refresh the page.
-   */
-  addName(): boolean {
-    // TODO: implement nameListService.post
-    this.names.push(this.newName);
-    this.newName = '';
-    return false;
+  resizeSidebar(event: MouseEvent): void {
+    this.isResizing = true;
+    this.lastX = event.clientX;
   }
 
+  get sidebarWidth(): number {
+    return this._sidebarWidth;
+  }
+
+  set sidebarWidth(sidebarWidth: number) {
+    this._sidebarWidth = sidebarWidth;
+    this.storageService.set(this.sidebarWidthKey, sidebarWidth);
+  }
+
+  get editorWidth(): number {
+    return this.windowWidth - this.sidebarWidth;
+  }
+
+  get maxSidebarWidth(): number {
+    return this.windowWidth - this.minSidebarWidth;
+  }
+  
+  private get windowWidth(): number {
+    return document.documentElement.clientWidth
+      || document.body.clientWidth;
+  }
 }

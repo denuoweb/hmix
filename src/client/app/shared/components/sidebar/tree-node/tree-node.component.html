@@ -1,0 +1,14 @@
+<div *ngIf="isFile">
+  <a class="item-name noselect" (click)="openFile(fileItem)">{{ fileItem.name }}</a>
+</div>
+<div *ngIf="isFolder">
+  <span *ngIf="!isRootFolder" class="expansion-caret">
+    <i *ngIf="expanded" class="fa fa-caret-down"></i>
+    <i *ngIf="!expanded" class="fa fa-caret-right"></i>
+  </span>
+  <a *ngIf="!isRootFolder" class="item-name noselect" (click)="toggleExpand()">{{ fileItem.name }}</a>
+
+  <ul class="child-items" *ngIf="expanded">
+    <sd-tree-node *ngFor="let item of fileItem.contents" [fileItem]="item"></sd-tree-node>
+  </ul>
+</div>

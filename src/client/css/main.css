@@ -20,52 +20,99 @@ body {
   box-sizing: border-box;
 }
 
-/* Set up a default font and some padding to provide breathing room */
+/* Fonts */
+@font-face {
+  font-family: "Roboto";
+  src: local(Roboto Thin),
+  url("../fonts/roboto/Roboto-Thin.woff2") format("woff2"),
+  url("../fonts/roboto/Roboto-Thin.woff") format("woff");
+  font-weight: 100
+}
+@font-face {
+  font-family: "Roboto";
+  src: local(Roboto Light),
+  url("../fonts/roboto/Roboto-Light.woff2") format("woff2"),
+  url("../fonts/roboto/Roboto-Light.woff") format("woff");
+  font-weight: 300
+}
+@font-face{
+  font-family: "Roboto";
+  src: local(Roboto Regular),
+  url("../fonts/roboto/Roboto-Regular.woff2") format("woff2"),
+  url("../fonts/roboto/Roboto-Regular.woff") format("woff");
+  font-weight: 400
+}
+@font-face{
+  font-family: "Roboto";
+  src: local(Roboto Medium),
+  url("../fonts/roboto/Roboto-Medium.woff2") format("woff2"),
+  url("../fonts/roboto/Roboto-Medium.woff") format("woff");
+  font-weight: 500
+}
+@font-face{
+  font-family: "Roboto";
+  src: local(Roboto Bold),
+  url("../fonts/roboto/Roboto-Bold.woff2") format("woff2"),
+  url("../fonts/roboto/Roboto-Bold.woff") format("woff");
+  font-weight: 700
+}
+
 body {
+  background-color: #232328;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-p {
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  line-height: 20px;
-  margin-bottom: 1em;
-  margin-top: 1em;
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: 0;
+  outline-style: none;
 }
 
-ul {
-  margin: 10px 0 0;
-  padding: 0 0 0 20px;
+/* File Tab Scrollbar */
+#file-tab-container::-webkit-scrollbar {
+  height: 3px;
 }
 
-li {
-  font-weight: 400;
-  margin-top: 4px;
+#file-tab-container::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.05);
 }
 
-input {
-  border: 1px solid #106cc8;
-  font-size: 14px;
-  height: 40px;
-  outline: none;
-  padding: 8px;
+#file-tab-container::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.8);
 }
 
-button {
-  background-color: #106cc8;
-  border-style: none;
-  color: rgba(255, 255, 255, 0.87);
-  cursor: pointer;
-  display: inline-block;
-  font-size: 14px;
-  height: 40px;
-  padding: 8px 18px;
-  text-decoration: none;
+#file-tab-container::-webkit-scrollbar-corner,
+#file-tab-container::-webkit-scrollbar-thumb:window-inactive {
+  background: rgba(100, 100, 100, 0.4);
 }
 
-button:hover {
-  background-color: #28739e;
+/* Ace Scrollbar */
+#ace-container ::-webkit-scrollbar {
+  height: 5px;
+  width: 7px;
+}
+
+#ace-container ::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.05);
+}
+
+#ace-container ::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.8);
+}
+
+#ace-container ::-webkit-scrollbar-corner,
+#ace-container ::-webkit-scrollbar-thumb:window-inactive {
+  background: rgba(100, 100, 100, 0.4);
+}
+
+/* Ace Styling */
+.ace_gutter-layer {
+  min-width: 52px !important;
 }
