@@ -116,3 +116,50 @@ body {
 .ace_gutter-layer {
   min-width: 52px !important;
 }
+
+/* Context Menu */
+.ngx-contextmenu .dropdown-menu {
+  -webkit-box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  color: white;
+  padding: 3px 0px;
+  background-color: #232328;
+  border: 1px solid #222127;
+  margin: 0;
+}
+
+.ngx-contextmenu ul {
+  list-style: none;
+}
+
+.ngx-contextmenu li {
+
+  position: relative;
+  cursor: pointer;
+}
+
+.ngx-contextmenu li:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.ngx-contextmenu a {
+  display: inline-block;
+  text-decoration: none;
+  color: white;
+  padding: 5px 20px;
+  width: 100%;
+  text-transform: lowercase;
+  
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: 0;
+  outline-style: none;
+}
+
+.ngx-contextmenu a.hasSubMenu::before {
+  content: none;
+}

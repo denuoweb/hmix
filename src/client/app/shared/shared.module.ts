@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
+import { ContextMenuModule } from './ext/ngx-contextmenu/ngx-contextmenu';
+
 // Components
 import { EditorComponent } from './components/editor/editor.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -19,7 +21,7 @@ import { EditorService } from './services/editor/editor.service';
  */
 
 @NgModule({
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ContextMenuModule.forRoot()],
   declarations: [SidebarComponent, EditorComponent, FileTreeComponent, TreeNodeComponent],
   exports: [SidebarComponent, EditorComponent, FileTreeComponent, TreeNodeComponent,
     CommonModule, FormsModule, RouterModule]

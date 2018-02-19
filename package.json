@@ -143,6 +143,7 @@
   "dependencies": {
     "@angular-devkit/build-optimizer": "^0.4.0",
     "@angular/animations": "^5.2.3",
+    "@angular/cdk": "^5.2.1",
     "@angular/common": "^5.2.3",
     "@angular/compiler": "^5.2.3",
     "@angular/core": "^5.2.3",
@@ -155,6 +156,7 @@
     "brace": "^0.11.1",
     "core-js": "^2.5.3",
     "intl": "^1.2.5",
+    "ngx-contextmenu": "^4.1.2",
     "rxjs": "^5.5.3",
     "systemjs": "0.21.0",
     "zone.js": "0.8.20"

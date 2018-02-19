@@ -58,6 +58,66 @@ export class ProjectConfig extends SeedConfig {
           defaultExtension: 'js',
           main: 'index'
         }
+      },
+      {
+        name: '@angular/cdk',
+        path: 'node_modules/@angular/cdk/bundles/cdk.umd.js'
+      },
+      {
+        name: '@angular/cdk/a11y',
+        path: 'node_modules/@angular/cdk/bundles/cdk-a11y.umd.js'
+      },
+      {
+        name: '@angular/cdk/accordion',
+        path: 'node_modules/@angular/cdk/bundles/cdk-accordion.umd.js'
+      },
+      {
+        name: '@angular/cdk/bidi',
+        path: 'node_modules/@angular/cdk/bundles/cdk-bidi.umd.js'
+      },
+      {
+        name: '@angular/cdk/coercion',
+        path: 'node_modules/@angular/cdk/bundles/cdk-coercion.umd.js'
+      },
+      {
+        name: '@angular/cdk/collections',
+        path: 'node_modules/@angular/cdk/bundles/cdk-collections.umd.js'
+      },
+      {
+        name: '@angular/cdk/keycodes',
+        path: 'node_modules/@angular/cdk/bundles/cdk-keycodes.umd.js'
+      },
+      {
+        name: '@angular/cdk/layout',
+        path: 'node_modules/@angular/cdk/bundles/cdk-layout.umd.js'
+      },
+      {
+        name: '@angular/cdk/observers',
+        path: 'node_modules/@angular/cdk/bundles/cdk-observers.umd.js'
+      },
+      {
+        name: '@angular/cdk/overlay',
+        path: 'node_modules/@angular/cdk/bundles/cdk-overlay.umd.js'
+      },
+      {
+        name: '@angular/cdk/platform',
+        path: 'node_modules/@angular/cdk/bundles/cdk-platform.umd.js'
+      },
+      {
+        name: '@angular/cdk/portal',
+        path: 'node_modules/@angular/cdk/bundles/cdk-portal.umd.js'
+      },
+      {
+        name: '@angular/cdk/scrolling',
+        path: 'node_modules/@angular/cdk/bundles/cdk-scrolling.umd.js'
+      },
+      {
+        name: '@angular/cdk/stepper',
+        path: 'node_modules/@angular/cdk/bundles/cdk-stepper.umd.js'
+      },
+      {
+        name: '@angular/cdk/table',
+        path: 'node_modules/@angular/cdk/bundles/cdk-table.umd.js'
       }
     ];
     this.addPackagesBundles(additionalPackages);
