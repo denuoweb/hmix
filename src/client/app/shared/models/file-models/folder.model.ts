@@ -7,12 +7,14 @@ export interface IFolder extends IFileItem {
 
 export class Folder implements IFolder {
   itemType = 'folder';
+  expanded: boolean;
   name: string;
   contents: (File|Folder)[];
 
-  constructor(name: string, contents: (File|Folder)[] = []) {
+  constructor(name: string, contents: (File|Folder)[] = [], expanded: boolean = false) {
     this.name = name;
     this.contents = contents;
+    this.expanded = expanded;
   }
 
   toObject(): Object { 
@@ -21,7 +23,8 @@ export class Folder implements IFolder {
       name: this.name,
       contents: this.contents.map((item: File|Folder) => {
         return item.toObject();
-      })
+      }),
+      expanded: this.expanded
     }
   }
 

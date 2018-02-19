@@ -48,12 +48,19 @@ export class FileService {
     this.selectedFile.saved = this.selectedFile.tempContent === this.selectedFile.content;
   }
 
+  saveFileTree(): void {
+    const fileTreeJson = this.fileTree.contents.map((fileItem) => {
+      return fileItem.toObject();
+    });
+    this.storageService.set(this.fileTreeKey, fileTreeJson);
+  }
+
   private loadFileTree(): void {
     const parseFileItem = (fileItem: any): File|Folder => {
       if (fileItem.itemType === 'file') {
         return new File(fileItem.name, fileItem.content, fileItem.open, fileItem.id);
       } else if (fileItem.itemType === 'folder') {
-        return new Folder(fileItem.name, fileItem.contents.map(parseFileItem));
+        return new Folder(fileItem.name, fileItem.contents.map(parseFileItem), fileItem.expanded);
       } else {
         return null;
       }
@@ -62,13 +69,6 @@ export class FileService {
     const fileTreeJson = this.storageService.get(this.fileTreeKey) || [];
     const contents = fileTreeJson.map(parseFileItem);
     this._fileTree = new Folder('', contents);
-  }
-
-  private saveFileTree(): void {
-    const fileTreeJson = this.fileTree.contents.map((fileItem) => {
-      return fileItem.toObject();
-    });
-    this.storageService.set(this.fileTreeKey, fileTreeJson);
   }
 
   get openFiles(): File[] {

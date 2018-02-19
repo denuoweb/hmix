@@ -10,12 +10,14 @@ import { FileService } from '../../../services/file/file.service';
 })
 export class TreeNodeComponent {
   @Input() fileItem: File|Folder;
-  private _expanded = false;
 
   constructor(private fileService: FileService) { }
 
   toggleExpand(): void {
-    this._expanded = !this._expanded;
+    if (this.fileItem instanceof Folder) {
+      this.fileItem.expanded = !this.fileItem.expanded;
+      this.fileService.saveFileTree();
+    }
   }
 
   openFile(file: File): void {
@@ -35,6 +37,6 @@ export class TreeNodeComponent {
   }
 
   get expanded(): boolean {
-    return this._expanded || this.isRootFolder;
+    return (this.fileItem instanceof Folder && this.fileItem.expanded) || this.isRootFolder;
   }
 }
