@@ -16,7 +16,7 @@ export class File implements IFile {
   open: boolean;
   saved = true;
 
-  constructor(name: string, content: string = '', open: boolean, id: string = UUID.UUID()) {
+  constructor(name: string, content: string = '', open: boolean = false, id: string = UUID.UUID()) {
     this.id = id;
     this.name = name;
     this.content = content;

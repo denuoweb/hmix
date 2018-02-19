@@ -10,8 +10,13 @@ import { FileService } from '../../../services/file/file.service';
 })
 export class TreeNodeComponent {
   @Input() fileItem: File|Folder;
+  private _currentParent: Folder;
+  private creatingFile: boolean;
+  private creatingFolder: boolean;
 
-  constructor(private fileService: FileService) { }
+  constructor(private fileService: FileService) {
+    this.watchInputClick();
+  }
 
   toggleExpand(): void {
     if (this.fileItem instanceof Folder) {
@@ -22,6 +27,68 @@ export class TreeNodeComponent {
 
   openFile(file: File): void {
     this.fileService.openFile(file);
+  }
+
+  deleteFile(file: File): void {
+    this.fileService.deleteFile(file);
+  }
+
+  deleteFolder(folder: Folder): void {
+    this.fileService.deleteFolder(folder);
+  }
+
+  startCreateFile(parent: Folder): void {
+    this.currentParent = parent;
+    this.creatingFile = true;
+  }
+  
+  startCreateFolder(parent: Folder): void {
+    this.currentParent = parent;
+    this.creatingFolder = true;
+  }
+  
+  watchInputClick(): void {
+    document.addEventListener('click', (event: MouseEvent) => {
+      this.createFileItem(event);
+    });
+  }
+
+  onNewItemEnter(): void {
+    this.createFileItem();
+  }
+  
+  private createFileItem(event?: MouseEvent): void {
+    if (!this.currentParent) {
+      return;
+    }
+    const newItemInput = <any>(document.getElementById('new-item-input'));
+    if (newItemInput && (!event || !newItemInput.contains(event.target))) {
+      const newItemName: string = newItemInput.value.trim();
+      if (newItemName !== '') {
+        if (this.creatingFile) {
+          this.fileService.createFile(newItemName, this.currentParent);
+        } else if (this.creatingFolder) {
+          this.fileService.createFolder(newItemName, this.currentParent);
+        }
+      }
+      this.creatingFile = false;
+      this.creatingFolder = false;
+      this.currentParent = undefined;
+    }
+  }
+
+  get currentParent(): Folder {
+    return this._currentParent;
+  }
+
+  set currentParent(parent: Folder) {
+    this._currentParent = parent;
+    if (parent) {
+      setTimeout(() => {
+        const newItemInput = <any>(document.getElementById('new-item-input'));
+        newItemInput.focus();
+      }, 25);
+    }
   }
 
   get isFile(): boolean {

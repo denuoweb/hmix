@@ -15,6 +15,18 @@ export class FileService {
     this.loadFileTree();
   }
 
+  createFile(name: string, parent: Folder): void {
+    const file = new File(name);
+    parent.contents.push(file);
+    this.saveFileTree();
+  }
+
+  createFolder(name: string, parent: Folder): void {
+    const folder = new Folder(name);
+    parent.contents.push(folder);
+    this.saveFileTree();
+  }
+
   openFile(file: File) {
     file.open = true;
     this.selectFile(file);
@@ -22,6 +34,7 @@ export class FileService {
   }
 
   closeFile(file: File) {
+    this.selectNext(file);
     file.open = false;
     this.saveFileTree();
   }
@@ -34,6 +47,29 @@ export class FileService {
   saveFile(file: File) {
     file.content = this.editorService.content;
     file.saved = true;
+    this.saveFileTree();
+  }
+
+  deleteFile(file: File): void {
+    this.selectNext(file);
+    this.fileTree.deleteFileItem(file);
+    this.saveFileTree();
+  }
+
+  selectNext(lastFile: File): void {
+    if (lastFile === this.selectedFile) {
+      const fileIndex = this.openFiles.indexOf(lastFile);
+      const newFileIndex = Math.max(0, fileIndex - 1);
+      console.log(newFileIndex);
+      this.selectedFile = this.openFiles.length > 0 ? this.openFiles[newFileIndex] : null;
+    }
+  }
+
+  deleteFolder(folder: Folder): void {
+    folder.files.map((file) => {
+      this.deleteFile(file);
+    });
+    this.fileTree.deleteFileItem(folder);
     this.saveFileTree();
   }
 

@@ -28,6 +28,23 @@ export class Folder implements IFolder {
     }
   }
 
+  deleteFileItem(fileItem: File|Folder): void {
+    for (let i = 0; i < this.contents.length; i++) {
+      let _fileItem = this.contents[i];
+      if (_fileItem instanceof File && _fileItem === fileItem) {
+        this.contents.splice(i, 1);
+        i--;
+      } else if (_fileItem instanceof Folder) {
+        if (_fileItem === fileItem) {
+          this.contents.splice(i, 1);
+          i--;
+        } else {
+          _fileItem.deleteFileItem(fileItem);
+        }
+      }
+    }
+  }
+
   getFileById(fileId: string): File {
     let file;
     this.contents.forEach((fileItem: File|Folder) => {
@@ -42,16 +59,28 @@ export class Folder implements IFolder {
     });
     return file;
   }
-
-  get openFiles(): File[] {
-    let openFiles: File[] = [];
+  
+  get files(): File[] {
+    let files: File[] = [];
     this.contents.forEach((fileItem: File|Folder) => {
-      if (fileItem instanceof File && fileItem.open) {
-        openFiles.push(fileItem);
+      if (fileItem instanceof File) {
+        files.push(fileItem);
       } else if (fileItem instanceof Folder) {
-        openFiles = openFiles.concat(fileItem.openFiles);
+        files = files.concat(fileItem.openFiles);
       }
     });
-    return openFiles;
+    return files;
+  }
+
+  get openFiles(): File[] {
+    return this.files.filter((file) => {
+      return file.open;
+    });
+  }
+
+  get sortedContents(): (File|Folder)[] {
+    return this.contents.sort((a, b) => {
+      return a.name.localeCompare(b.name);
+    });
   }
 }

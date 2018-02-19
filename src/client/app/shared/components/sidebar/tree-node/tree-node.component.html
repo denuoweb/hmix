@@ -9,7 +9,8 @@
   <a *ngIf="!isRootFolder" class="item-name noselect" (click)="toggleExpand()" [contextMenu]="folderMenu" [contextMenuSubject]="fileItem">{{ fileItem.name }}</a>
 
   <ul class="child-items" *ngIf="expanded">
-    <sd-tree-node *ngFor="let item of fileItem.contents" [fileItem]="item"></sd-tree-node>
+    <input id="new-item-input" name="new-item" *ngIf="fileItem === currentParent" (keydown.enter)="onNewItemEnter()">
+    <sd-tree-node *ngFor="let item of fileItem.sortedContents" [fileItem]="item"></sd-tree-node>
   </ul>
 </div>
 
@@ -26,16 +27,16 @@
 </context-menu>
 
 <context-menu #folderMenu>
-  <ng-template contextMenuItem (execute)="createFile($event.item)">
+  <ng-template contextMenuItem (execute)="startCreateFile($event.item)">
     New File
   </ng-template>
-  <ng-template contextMenuItem (execute)="createFolder($event.item)">
+  <ng-template contextMenuItem (execute)="startCreateFolder($event.item)">
     New Folder
   </ng-template>
-  <ng-template contextMenuItem (execute)="renameFile($event.item)">
+  <ng-template contextMenuItem (execute)="renameFolder($event.item)">
     Rename
   </ng-template>
-  <ng-template contextMenuItem (execute)="deleteFile($event.item)">
+  <ng-template contextMenuItem (execute)="deleteFolder($event.item)">
     Delete
   </ng-template>
 </context-menu>
