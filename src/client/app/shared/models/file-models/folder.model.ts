@@ -98,6 +98,14 @@ export class Folder implements IFolder {
 
   get sortedContents(): (File|Folder)[] {
     return this.contents.sort((a, b) => {
+      const isFolder = (fileItem: File|Folder) => {
+        return fileItem instanceof Folder;
+      };
+      if (isFolder(a) && !isFolder(b)) {
+        return -1;
+      } else if (!isFolder(a) && isFolder(b)) {
+        return 1;
+      }
       return a.name.localeCompare(b.name);
     });
   }
