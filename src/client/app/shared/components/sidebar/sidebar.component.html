@@ -1,3 +1,3 @@
-<div class="tab-name noselect">{{ selectedTab.name }}</div>
+<div class="tab-name noselect">{{ tabService.activeTab.displayName }}</div>
 
-<sd-file-tree></sd-file-tree>
+<sd-file-tree *ngIf="activeTabNameIs('file')"></sd-file-tree>

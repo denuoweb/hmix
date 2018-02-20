@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { TabService } from '../../services/tab/tab.service';
 import { FileService } from '../../services/file/file.service';
 
 @Component({
@@ -8,12 +9,11 @@ import { FileService } from '../../services/file/file.service';
   styleUrls: ['sidebar.component.css']
 })
 export class SidebarComponent {
-  private tabs = [{
-    id: '0',
-    name: 'File Explorer'
-  }];
-  private selectedTab = this.tabs[0];
-
-  constructor(private fileService: FileService) { }
+  constructor(private fileService: FileService,
+              private tabService: TabService) { }
+            
+  activeTabNameIs(tabName: string): boolean {
+    return this.tabService.activeTab.name === tabName;
+  }
 }
   

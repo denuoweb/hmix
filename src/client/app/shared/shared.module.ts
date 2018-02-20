@@ -16,6 +16,7 @@ import { TabsComponent } from './components/tabs/tabs.component';
 import { StorageService } from './services/storage/storage.service';
 import { FileService } from './services/file/file.service';
 import { EditorService } from './services/editor/editor.service';
+import { TabService } from './services/tab/tab.service';
 
 /**
  * Do not specify providers for modules that might be imported by a lazy loaded module.
@@ -31,7 +32,7 @@ export class SharedModule {
   static forRoot(): ModuleWithProviders {
     return {
       ngModule: SharedModule,
-      providers: [StorageService, FileService, EditorService]
+      providers: [StorageService, FileService, EditorService, TabService]
     };
   }
 }

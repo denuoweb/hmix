@@ -1,6 +1,3 @@
 <ul class="sidebar-tabs">
-  <li><i class="fa fa-folder-open"></i></li>
-  <li><i class="fa fa-bug"></i></li>
-  <li><i class="fa fa-play"></i></li>
-  <li><i class="fa fa-cogs"></i></li>
+  <li *ngFor="let tab of tabService.tabs" (click)="selectTab(tab)" [class.active]="tab.active"><i class="fa {{ tab.icon }}"></i></li>
 </ul>
