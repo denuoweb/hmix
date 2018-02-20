@@ -1,4 +1,4 @@
-<div id="file-tab-container">
+<div id="file-tab-container" [class.populated]="openFiles.length > 0">
   <div *ngFor="let file of openFiles" class="file-tab" [class.selected]="isSelected(file)" (mousedown)="onTabClick($event, file)">
     <span class="file-name noselect">{{ file.name }}</span>
     <span class="close-file-btn">

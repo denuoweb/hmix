@@ -26,6 +26,7 @@ export class EditorComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.initEditor();
     this.initShortcuts();
+    this.initSaveCheck();
   }
 
   onTabClick(event: MouseEvent, file: File): void {
@@ -76,6 +77,16 @@ export class EditorComponent implements AfterViewInit {
       },
       exec: () => {
         this.fileService.saveFile(this.selectedFile);
+      }
+    });
+  }
+  
+  private initSaveCheck(): void {
+    // Listen to an unload (window close) event
+    window.addEventListener('beforeunload', (event: Event) => {
+      // Confirm with the user before closing if we have unsaved files
+      if (this.fileService.hasUnsavedFiles) {
+        event.returnValue = true;
       }
     });
   }

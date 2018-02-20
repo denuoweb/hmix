@@ -14,7 +14,35 @@
 </head>
 <body>
 
-  <sd-app>Loading...</sd-app>
+  <sd-app>
+    <style>
+      sd-app {
+        color: #2e9ad0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      @keyframes up {
+        0% {
+          transform: translateY(-.4rem);
+        }
+        50% {
+          transform: translateY(.4rem);
+        }
+        100% {
+          transform: translateY(-.4rem);
+        }
+      }
+      .up {
+        animation: up 1.5s infinite;
+      }
+      .load-text {
+        margin: 0px 10px;
+      }
+    </style>
+    <span class="up">&lt/&gt</span> <span class="load-text">Setting things up...</span> <span class="up">&lt/&gt</span>
+  </sd-app>
 
   <script defer>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

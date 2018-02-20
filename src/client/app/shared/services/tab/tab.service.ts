@@ -18,7 +18,7 @@ export class TabService {
     },
     {
       name: 'run',
-      displayName: 'Execute',
+      displayName: 'Run',
       icon: 'fa-play',
       active: false
     },

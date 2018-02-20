@@ -119,6 +119,12 @@ export class FileService {
     return this.fileTree.openFiles;
   }
 
+  get hasUnsavedFiles(): boolean {
+    return this.fileTree.files.filter((file) => {
+      return !file.saved;
+    }).length > 0;
+  }
+
   get fileTree(): Folder {
     return this._fileTree;
   }
