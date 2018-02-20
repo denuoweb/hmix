@@ -3,6 +3,11 @@
   position: relative;
 }
 
+.root-folder-container {
+  position: relative;
+  height: 100%;
+}
+
 .child-items {
   margin: 0;
   padding: 0;
@@ -40,4 +45,23 @@
   background-color: rgba(255, 255, 255, 0.06);
   border: 1px solid #2e9ad0;
   color: #E2E2E2;
+  width: 100%;
+}
+
+.root-folder-name {
+  padding-left: 20px;
+  background-color: #383838;
+  width: 100%;
+  color: white;
+  display: block;
+  text-transform: uppercase;
+  height: 20px;
+  line-height: 20px;
+  font-size: 10px;
+}
+
+.root-children {
+  height: calc(100% - 20px);
+  overflow-y: overlay;
+  display: block;
 }

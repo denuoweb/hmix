@@ -63,7 +63,7 @@ export class Folder implements IFolder {
     return file;
   }
 
-  getItemDepth(fileItem: File|Folder, depth: number = 0): number {
+  getItemDepth(fileItem: File|Folder, depth: number = 1): number {
     for (let i = 0; i < this.contents.length; i++) {
       let _fileItem = this.contents[i];
       if (_fileItem.id === fileItem.id) {
@@ -105,6 +105,8 @@ export class Folder implements IFolder {
         return -1;
       } else if (!isFolder(a) && isFolder(b)) {
         return 1;
+      } else if (a.name === b.name) {
+        return a.id.localeCompare(b.id);
       }
       return a.name.localeCompare(b.name);
     });

@@ -7,3 +7,14 @@
   font-size: 12px;
   text-transform: uppercase;
 }
+
+:host {
+  overflow-y: hidden;
+  display: block;
+}
+
+.tab-output {
+  display: block;
+  height: calc(100% - 35px);
+  position: relative;
+}

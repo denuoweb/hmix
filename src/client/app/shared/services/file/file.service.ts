@@ -96,7 +96,7 @@ export class FileService {
   }
   
   getItemDepth(fileItem: File|Folder): number {
-    return this.fileTree.getItemDepth(fileItem);
+    return this.fileTree.getItemDepth(fileItem) || 0;
   }
 
   private loadFileTree(): void {

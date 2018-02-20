@@ -1,14 +1,15 @@
 <div *ngIf="isFile">
   <a class="item-name noselect" (click)="openFile(fileItem)" [contextMenu]="fileMenu" [contextMenuSubject]="fileItem" [style.paddingLeft.px]="itemNamePadding - padding">{{ fileItem.name }}</a>
 </div>
-<div *ngIf="isFolder">
+<div *ngIf="isFolder" [class.root-folder-container]="isRootFolder">
   <span *ngIf="!isRootFolder" class="expansion-caret" [style.left.px]="itemNamePadding - 14">
     <i *ngIf="expanded" class="fa fa-caret-down"></i>
     <i *ngIf="!expanded" class="fa fa-caret-right"></i>
   </span>
   <a *ngIf="!isRootFolder" class="item-name noselect" (click)="toggleExpand()" [contextMenu]="folderMenu" [contextMenuSubject]="fileItem" [style.paddingLeft.px]="itemNamePadding">{{ fileItem.name }}</a>
+  <a *ngIf="isRootFolder" [contextMenu]="rootFolderMenu" [contextMenuSubject]="fileItem" class="root-folder-name noselect">Qmix</a>
 
-  <ul class="child-items" *ngIf="expanded">
+  <ul class="child-items" [class.root-children]="isRootFolder" *ngIf="expanded">
     <div name="new-input-container" [style.paddingLeft.px]="itemNamePadding">
       <input id="new-item-input" name="new-item" *ngIf="fileItem === currentParent" (keydown.enter)="onNewItemEnter()">
     </div>
@@ -40,5 +41,14 @@
   </ng-template>
   <ng-template contextMenuItem (execute)="deleteFolder($event.item)">
     Delete
+  </ng-template>
+</context-menu>
+
+<context-menu #rootFolderMenu>
+  <ng-template contextMenuItem (execute)="startCreateFile($event.item)">
+    New File
+  </ng-template>
+  <ng-template contextMenuItem (execute)="startCreateFolder($event.item)">
+    New Folder
   </ng-template>
 </context-menu>
