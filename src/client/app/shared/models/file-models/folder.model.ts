@@ -1,5 +1,6 @@
 import { IFileItem } from './file-item.model';
 import { IFile, File } from './file.model';
+import { UUID } from 'angular2-uuid';
 
 export interface IFolder extends IFileItem {
   contents: (IFile|IFolder)[];
@@ -7,11 +8,13 @@ export interface IFolder extends IFileItem {
 
 export class Folder implements IFolder {
   itemType = 'folder';
+  id: string;
   expanded: boolean;
   name: string;
   contents: (File|Folder)[];
 
-  constructor(name: string, contents: (File|Folder)[] = [], expanded: boolean = false) {
+  constructor(name: string, contents: (File|Folder)[] = [], expanded: boolean = false, id: string = UUID.UUID()) {
+    this.id = id;
     this.name = name;
     this.contents = contents;
     this.expanded = expanded;
@@ -58,6 +61,21 @@ export class Folder implements IFolder {
       }
     });
     return file;
+  }
+
+  getItemDepth(fileItem: File|Folder, depth: number = 0): number {
+    for (let i = 0; i < this.contents.length; i++) {
+      let _fileItem = this.contents[i];
+      if (_fileItem.id === fileItem.id) {
+        return depth;
+      } else if (_fileItem instanceof Folder) {
+        const _depth = _fileItem.getItemDepth(fileItem, depth + 1);
+        if (_depth) {
+          return _depth;
+        }
+      }
+    }
+    return undefined;
   }
   
   get files(): File[] {

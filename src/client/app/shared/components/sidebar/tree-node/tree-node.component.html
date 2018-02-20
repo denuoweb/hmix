@@ -1,15 +1,17 @@
 <div *ngIf="isFile">
-  <a class="item-name noselect" (click)="openFile(fileItem)" [contextMenu]="fileMenu" [contextMenuSubject]="fileItem">{{ fileItem.name }}</a>
+  <a class="item-name noselect" (click)="openFile(fileItem)" [contextMenu]="fileMenu" [contextMenuSubject]="fileItem" [style.paddingLeft.px]="itemNamePadding">{{ fileItem.name }}</a>
 </div>
 <div *ngIf="isFolder">
-  <span *ngIf="!isRootFolder" class="expansion-caret">
+  <span *ngIf="!isRootFolder" class="expansion-caret" [style.left.px]="itemNamePadding - 14">
     <i *ngIf="expanded" class="fa fa-caret-down"></i>
     <i *ngIf="!expanded" class="fa fa-caret-right"></i>
   </span>
-  <a *ngIf="!isRootFolder" class="item-name noselect" (click)="toggleExpand()" [contextMenu]="folderMenu" [contextMenuSubject]="fileItem">{{ fileItem.name }}</a>
+  <a *ngIf="!isRootFolder" class="item-name noselect" (click)="toggleExpand()" [contextMenu]="folderMenu" [contextMenuSubject]="fileItem" [style.paddingLeft.px]="itemNamePadding">{{ fileItem.name }}</a>
 
   <ul class="child-items" *ngIf="expanded">
-    <input id="new-item-input" name="new-item" *ngIf="fileItem === currentParent" (keydown.enter)="onNewItemEnter()">
+    <div name="new-input-container" [style.paddingLeft.px]="itemNamePadding + padding">
+      <input id="new-item-input" name="new-item" *ngIf="fileItem === currentParent" (keydown.enter)="onNewItemEnter()">
+    </div>
     <sd-tree-node *ngFor="let item of fileItem.sortedContents" [fileItem]="item"></sd-tree-node>
   </ul>
 </div>

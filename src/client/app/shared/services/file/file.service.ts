@@ -59,9 +59,13 @@ export class FileService {
   selectNext(lastFile: File): void {
     if (lastFile === this.selectedFile) {
       const fileIndex = this.openFiles.indexOf(lastFile);
-      const newFileIndex = Math.max(0, fileIndex - 1);
-      console.log(newFileIndex);
-      this.selectedFile = this.openFiles.length > 0 ? this.openFiles[newFileIndex] : null;
+      let newFileIndex = fileIndex + 1;
+      if (fileIndex === 0) {
+        newFileIndex = 1;
+      } else if (fileIndex === this.openFiles.length - 1) {
+        newFileIndex = fileIndex - 1;
+      }
+      this.selectedFile = this.openFiles.length > 1 ? this.openFiles[newFileIndex] : null;
     }
   }
 
@@ -90,13 +94,17 @@ export class FileService {
     });
     this.storageService.set(this.fileTreeKey, fileTreeJson);
   }
+  
+  getItemDepth(fileItem: File|Folder): number {
+    return this.fileTree.getItemDepth(fileItem);
+  }
 
   private loadFileTree(): void {
     const parseFileItem = (fileItem: any): File|Folder => {
       if (fileItem.itemType === 'file') {
         return new File(fileItem.name, fileItem.content, fileItem.open, fileItem.id);
       } else if (fileItem.itemType === 'folder') {
-        return new Folder(fileItem.name, fileItem.contents.map(parseFileItem), fileItem.expanded);
+        return new Folder(fileItem.name, fileItem.contents.map(parseFileItem), fileItem.expanded, fileItem.id);
       } else {
         return null;
       }
@@ -121,7 +129,7 @@ export class FileService {
   
   set selectedFile(file: File) {
     this._selectedFile = file;
-    this.storageService.set(this.selectedFileKey, file.id);
+    this.storageService.set(this.selectedFileKey, file ? file.id : undefined);
   }
 
   get selectedFileId(): string {

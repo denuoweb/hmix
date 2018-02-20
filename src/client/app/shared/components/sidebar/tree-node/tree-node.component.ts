@@ -13,6 +13,7 @@ export class TreeNodeComponent {
   private _currentParent: Folder;
   private creatingFile: boolean;
   private creatingFolder: boolean;
+  private padding = 15;
 
   constructor(private fileService: FileService) {
     this.watchInputClick();
@@ -38,17 +39,22 @@ export class TreeNodeComponent {
   }
 
   startCreateFile(parent: Folder): void {
+    parent.expanded = true;
     this.currentParent = parent;
     this.creatingFile = true;
   }
   
   startCreateFolder(parent: Folder): void {
+    parent.expanded = true;
     this.currentParent = parent;
     this.creatingFolder = true;
   }
   
   watchInputClick(): void {
     document.addEventListener('click', (event: MouseEvent) => {
+      this.createFileItem(event);
+    });
+    document.addEventListener('contextmenu', (event: MouseEvent) => {
       this.createFileItem(event);
     });
   }
@@ -105,5 +111,9 @@ export class TreeNodeComponent {
 
   get expanded(): boolean {
     return (this.fileItem instanceof Folder && this.fileItem.expanded) || this.isRootFolder;
+  }
+
+  get itemNamePadding(): number {
+    return (this.fileService.getItemDepth(this.fileItem) + 1) * this.padding + 10;
   }
 }

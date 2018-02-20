@@ -10,6 +10,7 @@ import { EditorComponent } from './components/editor/editor.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FileTreeComponent } from './components/sidebar/file-tree/file-tree.component';
 import { TreeNodeComponent } from './components/sidebar/tree-node/tree-node.component';
+import { TabsComponent } from './components/tabs/tabs.component';
 
 // Services
 import { StorageService } from './services/storage/storage.service';
@@ -22,8 +23,8 @@ import { EditorService } from './services/editor/editor.service';
 
 @NgModule({
   imports: [CommonModule, RouterModule, ContextMenuModule.forRoot()],
-  declarations: [SidebarComponent, EditorComponent, FileTreeComponent, TreeNodeComponent],
-  exports: [SidebarComponent, EditorComponent, FileTreeComponent, TreeNodeComponent,
+  declarations: [SidebarComponent, EditorComponent, FileTreeComponent, TreeNodeComponent, TabsComponent],
+  exports: [SidebarComponent, EditorComponent, FileTreeComponent, TreeNodeComponent, TabsComponent,
     CommonModule, FormsModule, RouterModule]
 })
 export class SharedModule {

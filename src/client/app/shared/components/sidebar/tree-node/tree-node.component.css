@@ -4,8 +4,8 @@
 }
 
 .child-items {
-  padding-left: 18px;
   margin: 0;
+  padding: 0;
 }
 
 .item-name {
@@ -22,7 +22,7 @@
 }
 
 .item-name:hover {
-  color: #2e9ad0;
+  background-color: rgba(255, 255, 255, 0.01);
 }
 
 .expansion-caret {
@@ -34,4 +34,10 @@
 .expansion-caret i {
   position: relative;
   top: 1px;
+}
+
+#new-item-input {
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid #2e9ad0;
+  color: #E2E2E2;
 }

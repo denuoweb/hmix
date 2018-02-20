@@ -9,6 +9,7 @@ import { StorageService } from '../shared/services/storage/storage.service';
 })
 export class HomeComponent implements OnInit {
   private sidebarWidthKey = 'qmix-sidebar-width';
+  private tabsWidth = 50;
   private defaultSidebarWidth = 200;
   private minSidebarWidth = 150;
   private _sidebarWidth: number;
@@ -60,7 +61,7 @@ export class HomeComponent implements OnInit {
   }
 
   get editorWidth(): number {
-    return this.windowWidth - this.sidebarWidth;
+    return this.windowWidth - this.sidebarWidth - this.tabsWidth;
   }
 
   get maxSidebarWidth(): number {

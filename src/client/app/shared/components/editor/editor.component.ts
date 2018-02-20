@@ -30,8 +30,10 @@ export class EditorComponent implements AfterViewInit {
 
   onTabClick(event: MouseEvent, file: File): void {
     if (event.which === 2) {
+      /*
       event.preventDefault();
       this.closeFile(file);
+      */
     } else {
       this.selectFile(file);
     }
