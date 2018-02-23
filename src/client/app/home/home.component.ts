@@ -26,8 +26,8 @@ export class HomeComponent implements OnInit {
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
     if (!this.isResizing) return;
-    const currentX = event.clientX
-    
+    const currentX = event.clientX;
+
     // Calculate a new width
     if (currentX > 100) {
       const newWidth = this.sidebarWidth + currentX - this.lastX;
@@ -40,7 +40,7 @@ export class HomeComponent implements OnInit {
     // Force detect changes to avoid https://github.com/angular/angular/issues/6005
     this.changeDetector.detectChanges();
   }
-  
+
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent) {
     this.isResizing = false;
@@ -67,7 +67,7 @@ export class HomeComponent implements OnInit {
   get maxSidebarWidth(): number {
     return this.windowWidth - this.minSidebarWidth;
   }
-  
+
   private get windowWidth(): number {
     return document.documentElement.clientWidth
       || document.body.clientWidth;

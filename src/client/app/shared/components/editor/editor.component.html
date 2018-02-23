@@ -5,7 +5,7 @@
       <i (click)="closeFile(file)" class="fa fa-times"></i>
     </span>
     <span class="close-file-btn not-saved-indicator">
-      <i *ngIf="!file.saved" class="fa fa-circle"></i>
+      <i *ngIf="!file.isSaved" class="fa fa-circle"></i>
     </span>
   </div>
 </div>

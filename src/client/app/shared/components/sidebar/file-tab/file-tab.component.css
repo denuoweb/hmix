@@ -1,0 +1,46 @@
+.qmix-files-title {
+  padding-left: 10px;
+  background-color: #383838;
+  width: 100%;
+  color: white;
+  display: block;
+  text-transform: uppercase;
+  height: 20px;
+  line-height: 20px;
+  font-size: 10px;
+}
+
+.files-container {
+  height: calc(100% - 20px);
+  display: block;
+  overflow-y: overlay;
+}
+
+.file-name {
+  cursor: pointer;
+  height: 20px;
+  line-height: 20px;
+  font-size: 14px;
+  color: #E2E2E2;
+  padding-left: 10px;
+
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-name:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.new-file-input {
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid #2e9ad0;
+  color: #E2E2E2;
+  width: 100%;
+}
+
+.new-file-input:focus {
+  outline: none;
+}

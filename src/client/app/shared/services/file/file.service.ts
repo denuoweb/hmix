@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { EditorService } from '../editor/editor.service';
 import { StorageService } from '../storage/storage.service';
-import { File, Folder } from '../../models/file-models/index';
+import { File, IFileObject } from '../../models/file.model';
+import { UUID } from 'angular2-uuid';
 
 @Injectable()
 export class FileService {
-  private fileTreeKey = 'qmix-file-tree';
-  private selectedFileKey = 'qmix-selected-file';
-  private _fileTree: Folder;
+  private _filesKey = 'qmix-files';
+  private _selectedFileIdKey = 'qmix-selected-file';
+  private _files: File[] = [];
   private _selectedFile: File;
 
   constructor(private storageService: StorageService,
@@ -15,130 +16,132 @@ export class FileService {
     this.loadFileTree();
   }
 
-  createFile(name: string, parent: Folder): void {
-    const file = new File(name);
-    parent.contents.push(file);
-    this.saveFileTree();
+  createFile(name: string): void {
+    const newFile = new File({
+      id: UUID.UUID(),
+      name: name,
+      content: '',
+      isOpen: false
+    });
+    this._files.push(newFile);
+    this.openFile(newFile);
   }
 
-  createFolder(name: string, parent: Folder): void {
-    const folder = new Folder(name);
-    parent.contents.push(folder);
-    this.saveFileTree();
-  }
-
-  openFile(file: File) {
-    file.open = true;
-    this.selectFile(file);
-    this.saveFileTree();
-  }
-
-  closeFile(file: File) {
-    this.selectNext(file);
-    file.open = false;
-    this.saveFileTree();
-  }
-
-  selectFile(file: File) {
+  selectFile(file: File): void {
     this.selectedFile = file;
     this.editorService.content = file.tempContent;
   }
 
-  saveFile(file: File) {
+  openFile(file: File): void {
+    file.isOpen = true;
+    this.selectFile(file);
+    this.saveFileTree();
+  }
+
+  closeFile(file: File): void {
+    this.findFileToSelect(file);
+    file.isOpen = false;
+    this.saveFileTree();
+  }
+
+  saveFile(file: File): void {
     file.content = this.editorService.content;
-    file.saved = true;
+    file.isSaved = true;
     this.saveFileTree();
   }
 
   deleteFile(file: File): void {
-    this.selectNext(file);
-    this.fileTree.deleteFileItem(file);
-    this.saveFileTree();
-  }
-
-  selectNext(lastFile: File): void {
-    if (lastFile === this.selectedFile) {
-      const fileIndex = this.openFiles.indexOf(lastFile);
-      let newFileIndex = fileIndex + 1;
-      if (fileIndex === 0) {
-        newFileIndex = 1;
-      } else if (fileIndex === this.openFiles.length - 1) {
-        newFileIndex = fileIndex - 1;
-      }
-      this.selectedFile = this.openFiles.length > 1 ? this.openFiles[newFileIndex] : null;
-    }
-  }
-
-  deleteFolder(folder: Folder): void {
-    folder.files.map((file) => {
-      this.deleteFile(file);
+    this.findFileToSelect(file);
+    this._files = this._files.filter((_file) => {
+      return _file !== file;
     });
-    this.fileTree.deleteFileItem(folder);
     this.saveFileTree();
+  }
+
+  renameFile(file: File, newName: string): void {
+    file.name = newName;
+    this.saveFileTree();
+  }
+
+  onSelectedFileContentChanged(): void {
+    this.selectedFile.tempContent = this.editorService.content;
+    this.selectedFile.isSaved = this.selectedFile.tempContent === this.selectedFile.content;
   }
 
   loadSelectedFile(): void {
     if (this.selectedFileId) {
-      this.selectFile(this._fileTree.getFileById(this.selectedFileId));
+      this.selectFile(this._files.find((file) => {
+        return file.id === this.selectedFileId;
+      }));
     }
   }
 
-  selectedFileChanged(): void {
-    this.selectedFile.tempContent = this.editorService.content;
-    this.selectedFile.saved = this.selectedFile.tempContent === this.selectedFile.content;
-  }
+  private findFileToSelect(lastSelectedFile: File): void {
+    if (lastSelectedFile !== this.selectedFile) {
+      return;
+    }
 
-  saveFileTree(): void {
-    const fileTreeJson = this.fileTree.contents.map((fileItem) => {
-      return fileItem.toObject();
-    });
-    this.storageService.set(this.fileTreeKey, fileTreeJson);
-  }
-  
-  getItemDepth(fileItem: File|Folder): number {
-    return this.fileTree.getItemDepth(fileItem) || 0;
+    const fileIndex = this.openFiles.indexOf(lastSelectedFile);
+    let newFileIndex: number;
+    if (fileIndex === 0) {
+      newFileIndex = 1;
+    } else if (fileIndex === this.openFiles.length - 1) {
+      newFileIndex = fileIndex - 1;
+    } else {
+      newFileIndex = fileIndex + 1;
+    }
+
+    this.selectedFile = this.openFiles.length > 1 ? this.openFiles[newFileIndex] : null;
+    if (this.selectedFile) {
+      this.selectFile(this.selectedFile);
+    }
   }
 
   private loadFileTree(): void {
-    const parseFileItem = (fileItem: any): File|Folder => {
-      if (fileItem.itemType === 'file') {
-        return new File(fileItem.name, fileItem.content, fileItem.open, fileItem.id);
-      } else if (fileItem.itemType === 'folder') {
-        return new Folder(fileItem.name, fileItem.contents.map(parseFileItem), fileItem.expanded, fileItem.id);
-      } else {
-        return null;
-      }
-    };
-    
-    const fileTreeJson = this.storageService.get(this.fileTreeKey) || [];
-    const contents = fileTreeJson.map(parseFileItem);
-    this._fileTree = new Folder('', contents);
+    this._files = this.storageService.get(this._filesKey).map((fileObject: IFileObject) => {
+      return new File(fileObject);
+    });
   }
 
-  get openFiles(): File[] {
-    return this.fileTree.openFiles;
+  private saveFileTree(): void {
+    const fileObjects = this.files.map((file) => {
+      return file.toObject();
+    });
+    this.storageService.set(this._filesKey, fileObjects);
   }
 
   get hasUnsavedFiles(): boolean {
-    return this.fileTree.files.filter((file) => {
-      return !file.saved;
-    }).length > 0;
+    return this._files.some((file) => {
+      return !file.isSaved;
+    });
   }
 
-  get fileTree(): Folder {
-    return this._fileTree;
+  get openFiles(): File[] {
+    return this._files.filter((file) => {
+      return file.isOpen;
+    });
+  }
+
+  get sortedFiles(): File[] {
+    return this._files.sort((a, b) => {
+      return a.name.localeCompare(b.name);
+    });
   }
 
   get selectedFile(): File {
     return this._selectedFile;
   }
-  
+
   set selectedFile(file: File) {
     this._selectedFile = file;
-    this.storageService.set(this.selectedFileKey, file ? file.id : undefined);
+    this.storageService.set(this._selectedFileIdKey, file ? file.id : undefined);
   }
 
   get selectedFileId(): string {
-    return this.storageService.get(this.selectedFileKey);
+    return this.storageService.get(this._selectedFileIdKey);
+  }
+
+  get files(): File[] {
+    return this._files;
   }
 }

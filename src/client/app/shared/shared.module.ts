@@ -8,8 +8,7 @@ import { ContextMenuModule } from './ext/ngx-contextmenu/ngx-contextmenu';
 // Components
 import { EditorComponent } from './components/editor/editor.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
-import { FileTreeComponent } from './components/sidebar/file-tree/file-tree.component';
-import { TreeNodeComponent } from './components/sidebar/tree-node/tree-node.component';
+import { FileTabComponent } from './components/sidebar/file-tab/file-tab.component';
 import { TabsComponent } from './components/tabs/tabs.component';
 
 // Services
@@ -24,8 +23,8 @@ import { TabService } from './services/tab/tab.service';
 
 @NgModule({
   imports: [CommonModule, RouterModule, ContextMenuModule.forRoot()],
-  declarations: [SidebarComponent, EditorComponent, FileTreeComponent, TreeNodeComponent, TabsComponent],
-  exports: [SidebarComponent, EditorComponent, FileTreeComponent, TreeNodeComponent, TabsComponent,
+  declarations: [SidebarComponent, EditorComponent, TabsComponent, FileTabComponent],
+  exports: [SidebarComponent, EditorComponent, TabsComponent, FileTabComponent,
     CommonModule, FormsModule, RouterModule]
 })
 export class SharedModule {

@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { File } from '../../models/file-models/index';
 import { EditorService } from '../../services/editor/editor.service';
 import { FileService } from '../../services/file/file.service';
+import { File } from '../../models/file.model';
 
 // Ace editor imports
 import * as ace from 'brace';
@@ -57,7 +57,7 @@ export class EditorComponent implements AfterViewInit {
     this.editor.getSession().setMode('ace/mode/javascript');
     this.editor.setTheme('ace/theme/qmix');
     this.editor.getSession().on('change', () => {
-      this.fileService.selectedFileChanged();
+      this.fileService.onSelectedFileContentChanged();
     });
 
     this.editorService.editor = this.editor;
@@ -80,7 +80,7 @@ export class EditorComponent implements AfterViewInit {
       }
     });
   }
-  
+
   private initSaveCheck(): void {
     // Listen to an unload (window close) event
     window.addEventListener('beforeunload', (event: Event) => {
