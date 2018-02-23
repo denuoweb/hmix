@@ -10,7 +10,7 @@
     "build.tools": "tsc && gulp build.tools --color",
     "build.dev": "gulp build.dev --color --env-config dev",
     "build.dev.watch": "gulp build.dev.watch --color",
-    "build.prod": "gulp build.prod --color --env-config prod --build-type prod",
+    "build.prod": "node --max-old-space-size=8192 --stack_size=100000 ./node_modules/gulp/bin/gulp.js build.prod --color --env-config prod --build-type prod",
     "build.prod.exp": "gulp build.prod.aot --color --env-config prod --build-type prod",
     "build.prod.rollup.aot": "gulp build.prod.rollup.aot --color --env-config prod --build-type prod",
     "build.prod.aot": "gulp build.prod.aot --color --env-config prod --build-type prod",
