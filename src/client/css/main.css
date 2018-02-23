@@ -75,30 +75,28 @@ body {
   outline-style: none;
 }
 
-/* File Tab Scrollbar */
-#file-tab-container::-webkit-scrollbar {
-  height: 3px;
+/* Generic Scrollbar */
+::-webkit-scrollbar {
+  height: 5px;
+  width: 7px;
 }
 
-#file-tab-container::-webkit-scrollbar-track,
-#ace-container ::-webkit-scrollbar-track,
-#root-node ::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.05);
 }
 
-#file-tab-container::-webkit-scrollbar-thumb,
-#ace-container ::-webkit-scrollbar-thumb,
-#root-node ::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: rgba(100, 100, 100, 0.8);
 }
 
-#file-tab-container::-webkit-scrollbar-corner,
-#file-tab-container::-webkit-scrollbar-thumb:window-inactive,
-#ace-container ::-webkit-scrollbar-corner,
-#ace-container ::-webkit-scrollbar-thumb:window-inactive,
-#root-node ::-webkit-scrollbar-corner,
-#root-node ::-webkit-scrollbar-thumb:window-inactive {
+::-webkit-scrollbar-corner,
+::-webkit-scrollbar-thumb:window-inactive {
   background: rgba(100, 100, 100, 0.4);
+}
+
+/* File Tab Scrollbar */
+#file-tab-container::-webkit-scrollbar {
+  height: 3px;
 }
 
 /* Ace Scrollbar */

@@ -29,23 +29,18 @@ export class EditorComponent implements AfterViewInit {
     this.initSaveCheck();
   }
 
-  onTabClick(event: MouseEvent, file: File): void {
-    if (event.which === 2) {
-      /*
-      event.preventDefault();
-      this.closeFile(file);
-      */
-    } else {
-      this.selectFile(file);
-    }
-  }
-
   selectFile(file: File): void {
     this.fileService.selectFile(file);
   }
 
   closeFile(file: File): void {
     this.fileService.closeFile(file);
+  }
+
+  closeAll(): void {
+    this.openFiles.forEach((file) => {
+      this.closeFile(file);
+    });
   }
 
   isSelected(file: File): boolean {

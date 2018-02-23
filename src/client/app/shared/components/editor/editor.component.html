@@ -1,5 +1,5 @@
 <div id="file-tab-container" [class.populated]="openFiles.length > 0">
-  <div *ngFor="let file of openFiles" class="file-tab" [class.selected]="isSelected(file)" (mousedown)="onTabClick($event, file)">
+  <div *ngFor="let file of openFiles" class="file-tab" [class.selected]="isSelected(file)" (click)="selectFile(file)" [contextMenu]="fileTabMenu" [contextMenuSubject]="file">
     <span class="file-name noselect">{{ file.name }}</span>
     <span class="close-file-btn">
       <i (click)="closeFile(file)" class="fa fa-times"></i>
@@ -12,3 +12,12 @@
 
 <!-- Ace container -->
 <div [hidden]="!selectedFile" id="ace-container"></div>
+
+<context-menu #fileTabMenu>
+  <ng-template contextMenuItem (execute)="closeFile($event.item)">
+    Close
+  </ng-template>
+  <ng-template contextMenuItem (execute)="closeAll()">
+    Close All
+  </ng-template>
+</context-menu>

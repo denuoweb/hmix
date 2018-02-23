@@ -1,0 +1,52 @@
+.compiler-version {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  padding-left: 10px;
+  background-color: #383838;
+  width: 100%;
+  color: white;
+  display: block;
+  text-transform: uppercase;
+  height: 20px;
+  line-height: 20px;
+  font-size: 10px;
+}
+
+.loading-indicator {
+  padding: 10px 20px;
+}
+
+.auto-compile-input {
+  padding: 10px;
+}
+
+.compilation-error {
+  font-size: 14px;
+  padding: 15px 30px;
+  margin-bottom: 2px;
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.compilation-error pre {
+  margin: 0;
+}
+
+.compilation-error:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.error-type-warning {
+  background-color: rgba(240, 172, 78, 0.66);
+}
+
+.error-type-error {
+  background-color: rgba(217, 81, 79, 0.67);
+}

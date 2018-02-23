@@ -28,7 +28,9 @@ export class ProjectConfig extends SeedConfig {
 
     // Add `local` third-party libraries to be injected/bundled.
     this.APP_ASSETS = [
+      {src: `${this.APP_SRC}/ext/solc.bundle.js`, inject: true, vendor: false},
       {src: `${this.CSS_SRC}/font-awesome.min.css`, inject: true, vendor: false},
+      {src: `${this.CSS_SRC}/materialize.min.css`, inject: true, vendor: false}
     ];
 
     this.ROLLUP_INCLUDE_DIR = [
@@ -54,6 +56,14 @@ export class ProjectConfig extends SeedConfig {
       {
         name: 'angular2-uuid',
         path: 'node_modules/angular2-uuid',
+        packageMeta: {
+          defaultExtension: 'js',
+          main: 'index'
+        }
+      },
+      {
+        name: 'webworkify',
+        path: 'node_modules/webworkify',
         packageMeta: {
           defaultExtension: 'js',
           main: 'index'

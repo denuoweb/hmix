@@ -1,11 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
+
+// Services
 import { EditorService } from '../editor/editor.service';
 import { StorageService } from '../storage/storage.service';
+
+// Models
 import { File, IFileObject } from '../../models/file.model';
+
+// External Imports
 import { UUID } from 'angular2-uuid';
 
 @Injectable()
 export class FileService {
+  onFileSaved: EventEmitter<File> = new EventEmitter<File>();
   private _filesKey = 'qmix-files';
   private _selectedFileIdKey = 'qmix-selected-file';
   private _files: File[] = [];
@@ -48,6 +55,7 @@ export class FileService {
     file.content = this.editorService.content;
     file.isSaved = true;
     this.saveFileTree();
+    this.onFileSaved.emit(file);
   }
 
   deleteFile(file: File): void {

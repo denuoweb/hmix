@@ -1,0 +1,25 @@
+<div *ngIf="compilerVersion" class="compiler-version">Solc Version: {{ compilerVersion }}</div>
+
+<div *ngIf="loadingCompiler" class="loading-indicator">
+  <div class="progress">
+    <div class="indeterminate"></div>
+  </div>
+</div>
+
+<div *ngIf="!loadingCompiler">
+  <div class="auto-compile-input">
+    <input type="checkbox" name="auto-compile" id="auto-compile" [(ngModel)]="autoCompile">
+    <label for="auto-compile">Auto Compile</label>
+  </div>
+
+  <div *ngIf="compiling" class="loading-indicator">
+    <div class="progress">
+      <div class="indeterminate"></div>
+    </div>
+  </div>
+
+  <div *ngFor="let error of errors" class="compilation-error error-type-{{ parseErrorType(error.errorType) }}" (click)="gotoError(error)">
+    <div>{{ error.fileName }}:{{ error.lineNumber }}:{{ error.columnNumber }}: {{ error.errorType }}:</div>
+    <pre>{{ error.message }}</pre>
+  </div>
+</div>
