@@ -98,7 +98,8 @@ export class FileService {
   }
 
   private loadFileTree(): void {
-    this._files = this.storageService.get(this._filesKey).map((fileObject: IFileObject) => {
+    const files = this.storageService.get(this._filesKey) || [];
+    this._files = files.map((fileObject: IFileObject) => {
       return new File(fileObject);
     });
   }
