@@ -13,9 +13,9 @@ script:
 
 deploy:
   - provider: s3
-    access_key_id: AKIAIUEPSUT7HASMBYAQ
+    access_key_id: AKIAIMSBEHKOD72BOWKQ
     secret_access_key:
-      secure: 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
+      secure: "u2fTETSYPI8UIQEQBTeT+PHajCwQsETSA60hoQwC6iiEEtvq2jyzlnqVkV5e4dxfKTKAcs1W+rzIQRGPcpGkzgNxN2EaD+i72enaDhEI2o9cCRErVnyx7II/lJPkiErpRxd8JA1/qW8X6C1p4cm3HBCRYhUA4JmCCQny+F64gio+VGmRdYOWgQd+3952Ptx9CzKzQa8qu2wmphTwnjYQR6IGjWHISLYNyeEraSWJconws35mNpdlpdHCmM0O1rQktDJSVoR3euuWClpT3u/LO825En959g1qt7vN77LTfVoX6vL4eQeXDVt1Dt6vS9IH0yoakhXXYafyznKzOYL0+XIt3l6Vr7K+gJz6iN7r8LA5h6kW5U5QICUHLiwmXdaras9YRQMn7harlNuwccj64e0fMFV4N0q01XjTvLg27YUJrQ87hKC3pLiNh9aNstmc6qZQVRAblVl0DPCQub8qkzbKPfICd7rb22+TsmwQ8eR6PWhGyQI3MFvAHg09Lc4iCj434TAfxuv3EqX4YwmcwIRRMO65G6muW9iB7uiMHC7Yc8Aae/nG69O9K6Hi/5qF6hIVcN3kMkRx9uNUA/BEvEHHdn/9U5ROgzOp2MmMtSV0SeOi6LimApCTkkKECxd+CBidOkCr4z5Ker8Y20c1RnSC+57Ph35OHdbq6JV07Tw="
     bucket: stockyard-app
     skip_cleanup: true
     local_dir: dist/prod
