@@ -84,6 +84,12 @@ export class FileService {
     }
   }
 
+  getFileByName(fileName: string): File {
+    return this._files.find((file) => {
+      return file.name === fileName;
+    });
+  }
+
   private findFileToSelect(lastSelectedFile: File): void {
     if (lastSelectedFile !== this.selectedFile) {
       return;

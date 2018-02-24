@@ -4,6 +4,7 @@ import { compilerInput } from './compiler-input';
 
 // Services
 import { StorageService } from '../storage/storage.service';
+import { FileService } from '../file/file.service';
 
 // Models
 import { ICompilerSettings } from '../../models/compiler-settings.model';
@@ -29,7 +30,8 @@ export class CompilerService {
     contracts: []
   };
 
-  constructor(private storageService: StorageService) {
+  constructor(private storageService: StorageService,
+              private fileService: FileService) {
     this.loadSettings();
   }
 
@@ -139,6 +141,44 @@ export class CompilerService {
         resolve(result);
       });
     });
+  }
+
+  private gatherImports(sources: {
+    [fileName: string]: {
+      [content: string]: string
+    }
+  }, missingFiles: string[] = []): any {
+    const importRegex = /^\s*import\s*[\'\"]([^\'\"]+)[\'\"];/g;
+
+    for (const fileName in sources) {
+      let match;
+      while ((match = importRegex.exec(sources[fileName].content))) {
+        let importFilePath = match[1];
+        if (importFilePath.startsWith('./')) {
+          importFilePath = importFilePath.slice(2);
+        }
+
+        if (!missingFiles.includes(importFilePath)) {
+          missingFiles.push(importFilePath);
+        }
+      }
+    }
+
+    while (missingFiles.length > 0) {
+      const missingFile = missingFiles.pop();
+      if (missingFile in sources) {
+        continue;
+      }
+
+      const foundFile = this.fileService.getFileByName(missingFile);
+      if (foundFile) {
+        sources[foundFile.name] = {
+          content: foundFile.content
+        };
+      }
+    }
+
+    return sources;
   }
 
   private parseError(error: string): ICompilerError {
