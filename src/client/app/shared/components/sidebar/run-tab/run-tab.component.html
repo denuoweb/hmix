@@ -20,13 +20,18 @@
   <a class="waves-effect waves-light btn deploy-button" (click)="deploy()">Deploy</a>
 </div>
 
-<div *ngFor="let contract of loadedContracts" class="contract">
-  <div>{{ contract.name }}</div>
-  <div *ngFor="let fn of contract.functions" class="contract-fn">
-    <a class="waves-effect waves-light btn call-button" (click)="callOrSend(contract, fn)">{{ fn.name }}</a>
-    <div class="input-field fn-inputs" *ngIf="fn.inputs.length > 0">
-      <input name="function-inputs" type="text" [placeholder]="getFunctionInputs(fn)" [(ngModel)]="fn.args">
-      <label for="function-inputs" class="active">Function Arguments</label>
+<div class="contracts">
+  <div *ngFor="let contract of loadedContracts" class="contract-container">
+    <span class="contract-name" (click)="toggleExpand(contract)">{{ contract.name }} @{{ contract.address }}</span>
+    <div class="contract" *ngIf="contract.expanded">
+      <div *ngFor="let fn of contract.functions" class="contract-fn">
+        <a class="waves-effect waves-light btn call-button" (click)="callOrSend(contract, fn)">{{ fn.name }}</a>
+        <div class="input-field fn-inputs" *ngIf="fn.inputs.length > 0">
+          <input name="function-inputs" type="text" [placeholder]="getFunctionInputs(fn)" [(ngModel)]="fn.args">
+          <label for="function-inputs" class="active">Function Arguments</label>
+        </div>
+      </div>
     </div>
+    <span class="remove-contract" (click)="removeContract(contract)"><i class="fa fa-times"></i></span>
   </div>
 </div>

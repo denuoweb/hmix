@@ -40,6 +40,7 @@ export class RunTabComponent implements OnInit {
 
     // Make sure the Qtum.js Contract object has a name
     contract.name = this.selectedContract.name;
+    contract.expanded = true;
     contract.functions = contract.info.abi.filter((method: any) => {
       return method.type === 'function';
     }).map((method: any) => {
@@ -48,8 +49,6 @@ export class RunTabComponent implements OnInit {
 
     const args = this.constructorArgs ? this.constructorArgs.split(',') : [];
 
-    this._loadedContracts.push(contract);
-    console.log(this._loadedContracts);
     contract.deploy(args, {
       bytecode: this.selectedContract.evm.bytecode.object
     }).then((result: any) => {
@@ -69,6 +68,16 @@ export class RunTabComponent implements OnInit {
     return fn.inputs.map((input: any) => {
       return input.type;
     });
+  }
+
+  removeContract(contract: any): void {
+    this._loadedContracts = this._loadedContracts.filter((_contract) => {
+      return _contract !== contract;
+    });
+  }
+
+  toggleExpand(contract: any): void {
+    contract.expanded = !contract.expanded;
   }
 
   get constructorInputs(): string[] {

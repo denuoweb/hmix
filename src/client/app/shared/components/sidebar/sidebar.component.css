@@ -16,6 +16,7 @@
 .sidebar-tab {
   height: calc(100% - 35px);
   display: block;
+  overflow: hidden;
 }
 
 .sidebar-tab.hidden {

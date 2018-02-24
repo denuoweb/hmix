@@ -5,6 +5,9 @@ import { Subscription } from 'rxjs/Subscription';
 import { TabService } from '../shared/services/tab/tab.service';
 import { StorageService } from '../shared/services/storage/storage.service';
 
+// Constants
+import { STORAGE_KEYS } from '../shared/constants/storage-keys';
+
 @Component({
   moduleId: module.id,
   selector: 'sd-home',
@@ -12,13 +15,17 @@ import { StorageService } from '../shared/services/storage/storage.service';
   styleUrls: ['home.component.css'],
 })
 export class HomeComponent implements OnInit {
-  private sidebarWidthKey = 'qmix-sidebar-width';
   private tabsWidth = 50;
   private defaultSidebarWidth = 200;
+  private defaultTerminalHeight = 0;
   private minSidebarWidth = 150;
+  private minTerminalHeight = 100;
+  private _terminalHeight: number;
   private _sidebarWidth: number;
-  private isResizing: boolean;
+  private resizingSidebar: boolean;
+  private resizingTerminal: boolean;
   private lastX: number;
+  private lastY: number;
   private tabChangeSubscription: Subscription;
 
   constructor(private changeDetector: ChangeDetectorRef,
@@ -26,7 +33,8 @@ export class HomeComponent implements OnInit {
               private tabService: TabService) { }
 
   ngOnInit() {
-    this.sidebarWidth = this.storageService.get(this.sidebarWidthKey) || this.defaultSidebarWidth;
+    this.sidebarWidth = this.storageService.get(STORAGE_KEYS['sidebarWidth']) || this.defaultSidebarWidth;
+    this.terminalHeight = this.defaultTerminalHeight;
     this.tabChangeSubscription = this.tabService.onActiveTabChange.subscribe(() => {
       if (this.sidebarWidth < this.minSidebarWidth) {
         this.sidebarWidth = this.defaultSidebarWidth;
@@ -36,17 +44,34 @@ export class HomeComponent implements OnInit {
 
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
-    if (!this.isResizing) return;
-    const currentX = event.clientX;
+    if (!this.resizingSidebar && !this.resizingTerminal) return;
 
-    // Calculate a new width
-    if (currentX > 100) {
-      const newWidth = this.sidebarWidth + currentX - this.lastX;
-      this.sidebarWidth = Math.min(Math.max(newWidth, this.minSidebarWidth), this.maxSidebarWidth);
-    } else {
-      this.sidebarWidth = 0;
+    if (this.resizingSidebar) {
+      const currentX = event.clientX;
+
+      // Calculate a new width
+      if (currentX > this.minSidebarWidth) {
+        const newWidth = this.sidebarWidth + currentX - this.lastX;
+        this.sidebarWidth = Math.min(Math.max(newWidth, this.minSidebarWidth), this.maxSidebarWidth);
+      } else {
+        this.sidebarWidth = 0;
+      }
+
+      this.lastX = currentX;
+    } else if (this.resizingTerminal) {
+      const currentY = event.clientY;
+
+      // Calculate a new height
+      if (currentY < this.windowHeight - this.minTerminalHeight) {
+        const newHeight = this.terminalHeight - currentY + this.lastY;
+        console.log(newHeight);
+        this.terminalHeight = Math.min(Math.max(newHeight, this.minTerminalHeight), this.maxTerminalHeight);
+      } else {
+        this.terminalHeight = 0;
+      }
+
+      this.lastY = currentY;
     }
-    this.lastX = currentX;
 
     // Force detect changes to avoid https://github.com/angular/angular/issues/6005
     this.changeDetector.detectChanges();
@@ -54,21 +79,27 @@ export class HomeComponent implements OnInit {
 
   @HostListener('document:mouseup', ['$event'])
   onMouseUp(event: MouseEvent) {
-    this.isResizing = false;
+    this.resizingSidebar = false;
+    this.resizingTerminal = false;
   }
 
   resizeSidebar(event: MouseEvent): void {
-    this.isResizing = true;
+    this.resizingSidebar = true;
     this.lastX = event.clientX;
+  }
+
+  resizeTerminal(event: MouseEvent): void {
+    this.resizingTerminal = true;
+    this.lastY = event.clientY;
   }
 
   get sidebarWidth(): number {
     return this._sidebarWidth;
   }
 
-  set sidebarWidth(sidebarWidth: number) {
-    this._sidebarWidth = sidebarWidth;
-    this.storageService.set(this.sidebarWidthKey, sidebarWidth);
+  set sidebarWidth(width: number) {
+    this._sidebarWidth = width;
+    this.storageService.set(STORAGE_KEYS['sidebarWidth'], width);
   }
 
   get editorWidth(): number {
@@ -77,6 +108,27 @@ export class HomeComponent implements OnInit {
 
   get maxSidebarWidth(): number {
     return this.windowWidth - this.minSidebarWidth;
+  }
+
+  get terminalHeight(): number {
+    return this._terminalHeight;
+  }
+
+  set terminalHeight(height: number) {
+    this._terminalHeight = height;
+  }
+
+  get maxTerminalHeight(): number {
+    return this.windowHeight - this.minTerminalHeight;
+  }
+
+  get editorHeight(): number {
+    return this.windowHeight - this.terminalHeight;
+  }
+
+  private get windowHeight(): number {
+    return document.documentElement.clientHeight
+      || document.body.clientHeight;
   }
 
   private get windowWidth(): number {

@@ -6,6 +6,21 @@
   padding: 10px;
 }
 
+.rpc-url-input {
+  height: 100px;
+}
+
+.deployment-options {
+  height: 120px;
+}
+
+.contracts {
+  height: calc(100% - 220px);
+  overflow-y: overlay;
+  overflow-x: hidden;
+  display: block;
+}
+
 .rpc-url-input .input-field {
   width: 250px;
   color: white;
@@ -19,9 +34,17 @@
 
 .contract-form {
   width: 250px;
+  position: relative;
+  top: 9px;
+}
+
+#constructor-inputs {
+  margin-bottom: 0;
 }
 
 .constructor-input-field {
+  display: inline-block;
+  margin-left: 20px;
   width: 250px;
   color: white;
 }
@@ -37,13 +60,26 @@
   width: 250px;
 }
 
-.contract {
+.contract-container {
+  width: 100%;
+  position: relative;
+  padding-top: 35px;
   background: rgba(255, 255, 255, 0.05);
-  margin: 10px 0;
+}
+
+.contract-container:not(:first-child) {
+  margin-top: 20px;
+}
+
+.contract {
   padding: 10px;
+  padding-top: 0;
+  position: relative;
+  overflow-x: overlay;
 }
 
 .contract-fn {
+  white-space: nowrap;
   display: block;
   min-height: 50px;
 }
@@ -54,8 +90,30 @@
   display: inline-block;
 }
 
+.fn-inputs input {
+  margin-right: 20px;
+}
+
 .call-button {
   position: relative;
   top: 10px;
   margin-right: 20px;
+}
+
+.remove-contract {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  cursor: pointer;
+}
+
+.contract-name {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  cursor: pointer;
+  z-index: 1;
+  max-width: calc(100% - 35px);
+  white-space: nowrap;
+  overflow: hidden;
 }

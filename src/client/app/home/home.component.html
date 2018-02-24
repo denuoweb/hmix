@@ -4,7 +4,13 @@
 <div class="app-panel sidebar-panel" [style.width.px]="sidebarWidth">
   <sd-sidebar></sd-sidebar>
 </div>
-<div class="app-panel editor-panel" [style.width.px]="editorWidth">
+<div class="app-panel editor-terminal-panel" [style.width.px]="editorWidth">
   <div id="sidebar-divider" (mousedown)="resizeSidebar($event)"></div>
-  <sd-editor></sd-editor>
+  <div class="editor-panel" [style.height.px]="editorHeight">
+    <sd-editor></sd-editor>
+    <div id="terminal-divider" (mousedown)="resizeTerminal($event)"></div>
+  </div>
+  <div class="terminal-panel" [style.height.px]="terminalHeight">
+    <sd-terminal></sd-terminal>
+  </div>
 </div>

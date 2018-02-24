@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { ContextMenuModule } from './ext/ngx-contextmenu/ngx-contextmenu';
 
 // Components
+import { TerminalComponent } from './components/terminal/terminal.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FileTabComponent } from './components/sidebar/file-tab/file-tab.component';
@@ -46,7 +47,8 @@ import { MatProgressBarModule, MatSelectModule } from '@angular/material';
     TabsComponent,
     FileTabComponent,
     CompileTabComponent,
-    RunTabComponent
+    RunTabComponent,
+    TerminalComponent
   ],
   exports: [
     SidebarComponent,
@@ -54,6 +56,7 @@ import { MatProgressBarModule, MatSelectModule } from '@angular/material';
     TabsComponent,
     FileTabComponent,
     CompileTabComponent,
+    TerminalComponent,
     RunTabComponent,
     CommonModule,
     FormsModule,

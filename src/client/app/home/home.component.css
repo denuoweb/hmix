@@ -15,8 +15,14 @@
   background-color: rgba(255, 255, 255, 0.03);
 }
 
-.editor-panel {
+.editor-terminal-panel {
   float: right;
+}
+
+.editor-panel,
+.terminal-panel {
+  display: block;
+  position: relative;
 }
 
 #sidebar-divider {
@@ -27,6 +33,17 @@
   cursor: col-resize;
   width: 4px;
   background-color: transparent;
+  z-index: 5;
+}
+
+#terminal-divider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: transparent;
+  cursor: row-resize;
   z-index: 5;
 }
 
