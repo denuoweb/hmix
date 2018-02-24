@@ -39,13 +39,25 @@ export class CompilerService {
     [fileName: string]: {
       [content: string]: string
     }
-  }): Promise<ICompilerResult> {
+  }, retry = true): Promise<ICompilerResult> {
     const compilationPromise = this.useWebWorker ? this.compileWebWorker(sources) : this.compileSync(sources);
 
     return new Promise<ICompilerResult>((resolve, reject) => {
       compilationPromise.then((result) => {
-        this.parseCompilationResult(result);
-        resolve(this._latestCompilationResult);
+        if (result.missingInputs) {
+          sources = this.gatherImports(sources, result.missingInputs);
+          if (retry) {
+            this.compile(sources, false).then((result) => {
+              resolve(result);
+            });
+          } else {
+            this.parseCompilationResult(result);
+            resolve(this._latestCompilationResult)
+          }
+        } else {
+          this.parseCompilationResult(result);
+          resolve(this._latestCompilationResult);
+        }
       });
     });
   }
@@ -99,7 +111,7 @@ export class CompilerService {
           break;
 
         case 'CompileResult':
-          this.onCompilationFinished.emit(data.result);
+          this.onCompilationFinished.emit(data);
           break;
       }
     };
@@ -120,8 +132,17 @@ export class CompilerService {
   }): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       const input = compilerInput(sources, this.optimize);
-      const result = this.syncCompiler.compileStandardWrapper(input);
-      resolve(result);
+      let missingInputs: any[] = [];
+      const result = this.syncCompiler.compileStandardWrapper(input, (path: any) => {
+        missingInputs.push(path);
+        return {
+          error: 'Deferred import'
+        };
+      });
+      resolve({
+        result: result,
+        missingInputs: missingInputs
+      });
     });
   }
 
@@ -177,6 +198,8 @@ export class CompilerService {
         };
       }
     }
+
+    console.log(sources);
 
     return sources;
   }
@@ -238,10 +261,10 @@ export class CompilerService {
     });
   }
 
-  private parseCompilationResult(jsonResult: string): void {
-    const result = JSON.parse(jsonResult);
-    this.parseContracts(result);
-    this.parseErrors(result);
+  private parseCompilationResult(result: any): void {
+    const resultObject = JSON.parse(result.result);
+    this.parseContracts(resultObject);
+    this.parseErrors(resultObject);
   }
 
   private loadSettings(): void {
