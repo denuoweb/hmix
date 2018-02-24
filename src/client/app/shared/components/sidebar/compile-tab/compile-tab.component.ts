@@ -42,6 +42,9 @@ export class CompileTabComponent implements OnInit {
 
   compile(): void {
     const selectedFile = this.fileService.selectedFile;
+    if (!selectedFile) {
+      return;
+    }
 
     const sources: any = {};
     sources[selectedFile.name] = {
