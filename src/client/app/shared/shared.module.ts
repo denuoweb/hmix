@@ -18,6 +18,11 @@ import { FileService } from './services/file/file.service';
 import { EditorService } from './services/editor/editor.service';
 import { TabService } from './services/tab/tab.service';
 import { CompilerService } from './services/compiler/compiler.service';
+import { SolcVersionsService } from './services/solc-versions/solc-versions.service';
+
+// Material imports
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatProgressBarModule, MatSelectModule } from '@angular/material';
 
 /**
  * Do not specify providers for modules that might be imported by a lazy loaded module.
@@ -28,7 +33,10 @@ import { CompilerService } from './services/compiler/compiler.service';
     CommonModule,
     RouterModule,
     FormsModule,
-    ContextMenuModule.forRoot()
+    ContextMenuModule.forRoot(),
+    BrowserAnimationsModule,
+    MatProgressBarModule,
+    MatSelectModule
   ],
   declarations: [
     SidebarComponent,
@@ -56,7 +64,8 @@ export class SharedModule {
         FileService,
         EditorService,
         TabService,
-        CompilerService
+        CompilerService,
+        SolcVersionsService
       ]
     };
   }

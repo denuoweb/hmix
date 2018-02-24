@@ -1,26 +1,36 @@
 <div *ngIf="compilerVersion" class="compiler-version">Solc Version: {{ compilerVersion }}</div>
 
 <div *ngIf="loadingCompiler" class="loading-indicator">
-  <div class="progress">
-    <div class="indeterminate"></div>
-  </div>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>
 
 <div *ngIf="!loadingCompiler" class="main-container">
-  <div class="auto-compile-input">
-    <input type="checkbox" name="auto-compile" id="auto-compile" [(ngModel)]="autoCompile">
-    <label for="auto-compile">Auto Compile</label>
-  </div>
+  <div class="compile-container">
+    <a class="waves-effect waves-light btn compile-button" (click)="compile()">Compile</a>
 
-  <div *ngIf="compiling" class="loading-indicator">
-    <div class="progress">
-      <div class="indeterminate"></div>
+    <div class="auto-compile-input">
+      <input type="checkbox" name="auto-compile" id="auto-compile" [(ngModel)]="autoCompile">
+      <label for="auto-compile" [class.highlight]="autoCompile">Auto Compile</label>
+    </div>
+
+    <div class="solc-version-select">
+      <mat-form-field>
+        <mat-select [(value)]="selectedVersion" (selectionChange)="loadCompiler()">
+          <mat-option *ngFor="let version of solcVersions" [value]="version">{{ version.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
   </div>
 
+  <div *ngIf="compiling" class="loading-indicator">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+
   <div *ngIf="!compiling" class="errors-container">
-    <div *ngFor="let error of errors" class="compilation-error error-type-{{ parseErrorType(error.errorType) }}" (click)="gotoError(error)">
-      <div>{{ error.fileName }}:{{ error.lineNumber }}:{{ error.columnNumber }}: {{ error.errorType }}:</div>
+    <div *ngFor="let error of errors" class="compilation-error error-type-{{ parseErrorType(error.errorType) }} noselect" (click)="gotoError(error)">
+      <div *ngIf="error.lineNumber">{{ error.fileName }}:{{ error.lineNumber }}:{{ error.columnNumber }}: {{ error.errorType }}:</div>
+      <div *ngIf="!error.lineNumber">{{ error.errorType }}:</div>
+
       <pre>{{ error.message }}</pre>
     </div>
   </div>

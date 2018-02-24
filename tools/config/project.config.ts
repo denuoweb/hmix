@@ -24,6 +24,9 @@ export class ProjectConfig extends SeedConfig {
       ...this.NPM_DEPENDENCIES,
       // {src: 'jquery/dist/jquery.min.js', inject: 'libs'},
       // {src: 'lodash/lodash.min.js', inject: 'libs'},
+      {src: '@angular/material/prebuilt-themes/indigo-pink.css', inject: true},
+      {src: 'web-animations-js/web-animations.min.js', inject: 'shims'},
+      {src: 'hammerjs/hammer.js', inject: 'libs'},
     ];
 
     // Add `local` third-party libraries to be injected/bundled.
@@ -68,6 +71,10 @@ export class ProjectConfig extends SeedConfig {
           defaultExtension: 'js',
           main: 'index'
         }
+      },
+      {
+        name: '@angular/material',
+        path: 'node_modules/@angular/material/bundles/material.umd.js'
       },
       {
         name: '@angular/cdk',

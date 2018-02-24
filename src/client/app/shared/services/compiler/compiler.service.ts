@@ -63,8 +63,7 @@ export class CompilerService {
     });
   }
 
-  async loadCompiler(): Promise<void> {
-    const solcUrl = '/ext/soljson.js';
+  async loadCompiler(solcUrl: string): Promise<void> {
     return this.useWebWorker ? this.loadWebWorker(solcUrl) : this.loadSync(solcUrl);
   }
 
@@ -105,8 +104,9 @@ export class CompilerService {
       command: 'LoadVersion',
       solcUrl: solcUrl
     });
+
+    // Listen for messages
     this.webWorker.onmessage = (msg) => {
-      console.log(msg);
       const data = msg.data;
       switch (data.command) {
         case 'VersionLoaded':
@@ -204,14 +204,24 @@ export class CompilerService {
       }
     }
 
-    console.log(sources);
-
     return sources;
   }
 
   private parseError(error: string): ICompilerError {
     const pattern: any = /(.*?):(\d+):(\d+): (.*?): ([^]+)/g;
     const match = pattern.exec(error);
+
+    // This error doesn't fit the mold
+    if (!match) {
+      return {
+        fileName: null,
+        lineNumber: null,
+        columnNumber: null,
+        errorType: 'error',
+        message: error
+      };
+    }
+
     return {
       fileName: match[1],
       lineNumber: parseInt(match[2], 10),

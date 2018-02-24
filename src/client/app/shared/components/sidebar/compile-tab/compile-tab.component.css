@@ -19,8 +19,36 @@
   padding: 10px 20px;
 }
 
-.auto-compile-input {
+.compile-container {
   padding: 10px;
+  white-space: nowrap;
+}
+
+.compile-button {
+  height: 25px;
+  line-height: 25px;
+  border-radius: 0px;
+  border: 1px solid #2e9ad0;
+  background: transparent;
+  display: inline-block;
+}
+
+.auto-compile-input,
+.solc-version-select {
+  margin-left: 25px;
+  display: inline-block;
+}
+
+.auto-compile-input label {
+  -webkit-transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+}
+
+.auto-compile-input label.highlight {
+  color: white;
 }
 
 .main-container {

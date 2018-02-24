@@ -157,3 +157,29 @@ body {
 .ngx-contextmenu a.hasSubMenu::before {
   content: none;
 }
+
+/* Angular Material */
+.mat-select-value-text {
+  color: white;
+}
+
+.mat-select-arrow {
+  color: white;
+}
+
+.mat-form-field-underline {
+  background-color: white;
+}
+
+.mat-progress-bar-fill:after {
+  background-color: #2e9ad0;
+}
+
+.mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
+  color: #2e9ad0;
+}
+
+[type="checkbox"]:checked+label:before {
+  border-right: 2px solid #2e9ad0;
+  border-bottom: 2px solid #2e9ad0;
+}

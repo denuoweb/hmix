@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
 // Models
+import { ISolcVersion } from '../../../models/solc-version.model';
 import { ICompilerResult, ICompilerError } from '../../../models/compiler-result.model';
 
 // Services
 import { FileService } from '../../../services/file/file.service';
 import { EditorService } from '../../../services/editor/editor.service';
 import { CompilerService } from '../../../services/compiler/compiler.service';
+import { SolcVersionsService } from '../../../services/solc-versions/solc-versions.service';
 
 @Component({
   moduleId: module.id,
@@ -24,12 +26,17 @@ export class CompileTabComponent implements OnInit {
   private fileSavedSubscription: Subscription;
   private compilationSubscription: Subscription;
   private _compiling: boolean;
+  private _selectedVersion: ISolcVersion;
 
   constructor(private compilerService: CompilerService,
               private fileService: FileService,
-              private editorService: EditorService) { }
+              private editorService: EditorService,
+              private solcVersionsService: SolcVersionsService) {
+    this._selectedVersion = solcVersionsService.defaultVersion;
+  }
 
   ngOnInit() {
+    this.solcVersionsService.loadVersions();
     this.loadCompiler();
   }
 
@@ -50,18 +57,33 @@ export class CompileTabComponent implements OnInit {
   }
 
   gotoError(error: ICompilerError): void {
+    // Some errors might not be referencing a specific line
+    if (!error.lineNumber || !error.columnNumber) {
+      return;
+    }
+
+    // Open the file we're referencing
     const errorFile = this.fileService.getFileByName(error.fileName);
     this.fileService.selectFile(errorFile);
 
+    // Go to the error
     this.editorService.highlightLine(error.lineNumber);
     this.editorService.gotoLine(error.lineNumber, error.columnNumber);
   }
 
   private loadCompiler(): void {
     this._loadingCompiler = true;
-    this.compilerService.loadCompiler().then(() => {
+    this.compilerService.loadCompiler(this.selectedVersion.url).then(() => {
       this._loadingCompiler = false;
       this.compile();
+
+      // Unsubscribe to make sure we don't create multiple subscriptions
+      if (this.fileSavedSubscription) {
+        this.fileSavedSubscription.unsubscribe();
+      }
+      if (this.compilationSubscription) {
+        this.compilationSubscription.unsubscribe();
+      }
 
       // Set up subscriptions
       this.fileSavedSubscription = this.fileService.onFileSaved.subscribe(() => {
@@ -104,5 +126,17 @@ export class CompileTabComponent implements OnInit {
 
   get compiling(): boolean {
     return this._compiling;
+  }
+
+  get solcVersions(): ISolcVersion[] {
+    return this.solcVersionsService.solcVersions;
+  }
+
+  get selectedVersion(): ISolcVersion {
+    return this._selectedVersion;
+  }
+
+  set selectedVersion(version: ISolcVersion) {
+    this._selectedVersion = version;
   }
 }
