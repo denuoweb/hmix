@@ -1,0 +1,61 @@
+:host {
+  color: white;
+}
+
+.rpc-url-input {
+  padding: 10px;
+}
+
+.rpc-url-input .input-field {
+  width: 250px;
+  color: white;
+}
+
+.deployment-options {
+  padding: 0 10px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.contract-form {
+  width: 250px;
+}
+
+.constructor-input-field {
+  width: 250px;
+  color: white;
+}
+
+.deploy-button,
+.call-button {
+  height: 25px;
+  line-height: 25px;
+  border-radius: 0px;
+  border: 1px solid #2e9ad0;
+  background: transparent;
+  display: block;
+  width: 250px;
+}
+
+.contract {
+  background: rgba(255, 255, 255, 0.05);
+  margin: 10px 0;
+  padding: 10px;
+}
+
+.contract-fn {
+  display: block;
+  min-height: 50px;
+}
+
+.call-button,
+.fn-inputs {
+  width: 250px;
+  display: inline-block;
+}
+
+.call-button {
+  position: relative;
+  top: 10px;
+  margin-right: 20px;
+}

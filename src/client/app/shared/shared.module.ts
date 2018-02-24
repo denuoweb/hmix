@@ -20,6 +20,7 @@ import { EditorService } from './services/editor/editor.service';
 import { TabService } from './services/tab/tab.service';
 import { CompilerService } from './services/compiler/compiler.service';
 import { SolcVersionsService } from './services/solc-versions/solc-versions.service';
+import { QtumService } from './services/qtum/qtum.service';
 
 // Material imports
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -69,7 +70,8 @@ export class SharedModule {
         EditorService,
         TabService,
         CompilerService,
-        SolcVersionsService
+        SolcVersionsService,
+        QtumService
       ]
     };
   }

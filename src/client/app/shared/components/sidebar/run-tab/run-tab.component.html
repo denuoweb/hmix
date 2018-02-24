@@ -1,0 +1,32 @@
+<div class="rpc-url-input">
+  <div class="input-field">
+    <input id="qtum-rpc-url" name="qtum-rpc-url" type="text" [(ngModel)]="rpcUrl">
+    <label for="qtum-rpc-url" class="active">Qtum RPC URL</label>
+  </div>
+</div>
+
+<div class="deployment-options" *ngIf="contracts.length > 0">
+  <mat-form-field class="contract-form">
+    <mat-select [(value)]="selectedContract">
+      <mat-option *ngFor="let contract of contracts" [value]="contract">{{ contract.name }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="input-field constructor-input-field" *ngIf="constructorInputs.length > 0">
+    <input id="constructor-inputs" name="constructor-inputs" type="text" [placeholder]="constructorInputs" [(ngModel)]="constructorArgs">
+    <label for="constructor-inputs" class="active">Constructor Arguments</label>
+  </div>
+
+  <a class="waves-effect waves-light btn deploy-button" (click)="deploy()">Deploy</a>
+</div>
+
+<div *ngFor="let contract of loadedContracts" class="contract">
+  <div>{{ contract.name }}</div>
+  <div *ngFor="let fn of contract.functions" class="contract-fn">
+    <a class="waves-effect waves-light btn call-button" (click)="callOrSend(contract, fn)">{{ fn.name }}</a>
+    <div class="input-field fn-inputs" *ngIf="fn.inputs.length > 0">
+      <input name="function-inputs" type="text" [placeholder]="getFunctionInputs(fn)" [(ngModel)]="fn.args">
+      <label for="function-inputs" class="active">Function Arguments</label>
+    </div>
+  </div>
+</div>

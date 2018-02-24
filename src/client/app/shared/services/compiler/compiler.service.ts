@@ -19,13 +19,14 @@ import { STORAGE_KEYS } from '../../constants/storage-keys';
 @Injectable()
 export class CompilerService {
   onCompilationRequested: EventEmitter<void> = new EventEmitter<void>();
+  onCompilationFinished: EventEmitter<void> = new EventEmitter<void>();
   private compilerWorkerScriptUrl = '/app/shared/services/compiler/worker.js';
   private webWorker: Worker;
   private syncCompiler: any;
   private _settings: ICompilerSettings;
   private _compilerVersion: string;
   private onCompilerLoaded: EventEmitter<any> = new EventEmitter<any>();
-  private onCompilationFinished: EventEmitter<any> = new EventEmitter<any>();
+  private onWebWorkerFinished: EventEmitter<any> = new EventEmitter<any>();
   private _latestCompilationResult: ICompilerResult = {
     errors: [],
     contracts: []
@@ -53,10 +54,12 @@ export class CompilerService {
             });
           } else {
             this.parseCompilationResult(result);
+            this.onCompilationFinished.emit();
             resolve(this._latestCompilationResult);
           }
         } else {
           this.parseCompilationResult(result);
+          this.onCompilationFinished.emit();
           resolve(this._latestCompilationResult);
         }
       });
@@ -116,7 +119,7 @@ export class CompilerService {
           break;
 
         case 'CompileResult':
-          this.onCompilationFinished.emit(data);
+          this.onWebWorkerFinished.emit(data);
           break;
       }
     };
@@ -162,7 +165,7 @@ export class CompilerService {
         command: 'CompileRequest',
         input: input
       });
-      const compilationResultSub = this.onCompilationFinished.subscribe((result: any) => {
+      const compilationResultSub = this.onWebWorkerFinished.subscribe((result: any) => {
         compilationResultSub.unsubscribe();
         resolve(result);
       });
@@ -323,5 +326,9 @@ export class CompilerService {
 
   get compilerVersion(): string {
     return this._compilerVersion;
+  }
+
+  get contracts(): ICompilerContract[] {
+    return this._latestCompilationResult.contracts;
   }
 }

@@ -8,8 +8,8 @@ export interface ICompilerError {
 
 export interface ICompilerContract {
   name: string;
-  abi: any[];
-  evm: any[];
+  abi: any;
+  evm: any;
 }
 
 export interface ICompilerResult {
