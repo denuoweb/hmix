@@ -1,4 +1,8 @@
 import { Component, OnInit, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
+
+// Services
+import { TabService } from '../shared/services/tab/tab.service';
 import { StorageService } from '../shared/services/storage/storage.service';
 
 @Component({
@@ -15,12 +19,19 @@ export class HomeComponent implements OnInit {
   private _sidebarWidth: number;
   private isResizing: boolean;
   private lastX: number;
+  private tabChangeSubscription: Subscription;
 
   constructor(private changeDetector: ChangeDetectorRef,
-              private storageService: StorageService) { }
+              private storageService: StorageService,
+              private tabService: TabService) { }
 
   ngOnInit() {
     this.sidebarWidth = this.storageService.get(this.sidebarWidthKey) || this.defaultSidebarWidth;
+    this.tabChangeSubscription = this.tabService.onActiveTabChange.subscribe(() => {
+      if (this.sidebarWidth < this.minSidebarWidth) {
+        this.sidebarWidth = this.defaultSidebarWidth;
+      }
+    });
   }
 
   @HostListener('document:mousemove', ['$event'])

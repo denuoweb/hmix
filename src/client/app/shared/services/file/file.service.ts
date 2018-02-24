@@ -55,10 +55,14 @@ export class FileService {
   }
 
   saveFile(file: File): void {
+    // Only wany to fire this if we changed the content
+    if (file.content !== this.editorService.content) {
+      this.onFileSaved.emit(file);
+    }
+
     file.content = this.editorService.content;
     file.isSaved = true;
     this.saveFileTree();
-    this.onFileSaved.emit(file);
   }
 
   deleteFile(file: File): void {

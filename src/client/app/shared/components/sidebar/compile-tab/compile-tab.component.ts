@@ -43,7 +43,6 @@ export class CompileTabComponent implements OnInit {
   compile(): void {
     const selectedFile = this.fileService.selectedFile;
 
-    // TODO: Allow file imports
     const sources: any = {};
     sources[selectedFile.name] = {
       'content': this.editorService.content

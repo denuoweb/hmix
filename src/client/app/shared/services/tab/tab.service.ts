@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { ITab } from '../../models/tab.model';
 
 @Injectable()
 export class TabService {
+  onActiveTabChange: EventEmitter<void> = new EventEmitter<void>();
   private _tabs: ITab[] = [
     {
       name: 'file',
@@ -45,5 +46,6 @@ export class TabService {
       tab.active = false;
     });
     tab.active = true;
+    this.onActiveTabChange.emit();
   }
 }

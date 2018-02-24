@@ -20,7 +20,8 @@
 }
 
 .compile-container {
-  padding: 10px;
+  height: 60px;
+  padding: 0 10px;
   white-space: nowrap;
 }
 
@@ -58,7 +59,7 @@
 }
 
 .errors-container {
-  height: calc(100% - 45px);
+  height: calc(100% - 60px);
   overflow-y: overlay;
 }
 
