@@ -12,3 +12,12 @@
   font-size: 12px;
   text-transform: uppercase;
 }
+
+.sidebar-tab {
+  height: calc(100% - 35px);
+  display: block;
+}
+
+.sidebar-tab.hidden {
+  display: none;
+}

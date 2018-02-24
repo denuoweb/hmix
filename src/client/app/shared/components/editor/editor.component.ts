@@ -1,6 +1,11 @@
 import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+
+// Services
+import { CompilerService } from '../../services/compiler/compiler.service';
 import { EditorService } from '../../services/editor/editor.service';
 import { FileService } from '../../services/file/file.service';
+
+// Models
 import { File } from '../../models/file.model';
 
 // Ace editor imports
@@ -21,7 +26,8 @@ export class EditorComponent implements AfterViewInit {
 
   constructor(private fileService: FileService,
               private editorService: EditorService,
-              private changeDetector: ChangeDetectorRef) { }
+              private changeDetector: ChangeDetectorRef,
+              private compilerService: CompilerService) { }
 
   ngAfterViewInit(): void {
     this.initEditor();
@@ -31,6 +37,7 @@ export class EditorComponent implements AfterViewInit {
 
   selectFile(file: File): void {
     this.fileService.selectFile(file);
+    this.compilerService.requestCompilation();
   }
 
   closeFile(file: File): void {

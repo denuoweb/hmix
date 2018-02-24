@@ -18,6 +18,7 @@ import { STORAGE_KEYS } from '../../constants/storage-keys';
 
 @Injectable()
 export class CompilerService {
+  onCompilationRequested: EventEmitter<void> = new EventEmitter<void>();
   private compilerWorkerScriptUrl = '/app/shared/services/compiler/worker.js';
   private webWorker: Worker;
   private syncCompiler: any;
@@ -52,7 +53,7 @@ export class CompilerService {
             });
           } else {
             this.parseCompilationResult(result);
-            resolve(this._latestCompilationResult)
+            resolve(this._latestCompilationResult);
           }
         } else {
           this.parseCompilationResult(result);
@@ -65,6 +66,10 @@ export class CompilerService {
   async loadCompiler(): Promise<void> {
     const solcUrl = '/ext/soljson.js';
     return this.useWebWorker ? this.loadWebWorker(solcUrl) : this.loadSync(solcUrl);
+  }
+
+  requestCompilation(): void {
+    this.onCompilationRequested.emit();
   }
 
   private async loadSync(solcUrl: string): Promise<void> {
@@ -132,7 +137,7 @@ export class CompilerService {
   }): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       const input = compilerInput(sources, this.optimize);
-      let missingInputs: any[] = [];
+      const missingInputs: any[] = [];
       const result = this.syncCompiler.compileStandardWrapper(input, (path: any) => {
         missingInputs.push(path);
         return {

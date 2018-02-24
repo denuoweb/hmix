@@ -35,6 +35,9 @@ export class FileService {
   }
 
   selectFile(file: File): void {
+    if (!file.isOpen) {
+      this.openFile(file);
+    }
     this.selectedFile = file;
     this.editorService.content = file.tempContent;
   }

@@ -22,6 +22,7 @@ export class CompileTabComponent implements OnInit {
     contracts: []
   };
   private fileSavedSubscription: Subscription;
+  private compilationSubscription: Subscription;
   private _compiling: boolean;
 
   constructor(private compilerService: CompilerService,
@@ -49,6 +50,9 @@ export class CompileTabComponent implements OnInit {
   }
 
   gotoError(error: ICompilerError): void {
+    const errorFile = this.fileService.getFileByName(error.fileName);
+    this.fileService.selectFile(errorFile);
+
     this.editorService.highlightLine(error.lineNumber);
     this.editorService.gotoLine(error.lineNumber, error.columnNumber);
   }
@@ -58,7 +62,12 @@ export class CompileTabComponent implements OnInit {
     this.compilerService.loadCompiler().then(() => {
       this._loadingCompiler = false;
       this.compile();
+
+      // Set up subscriptions
       this.fileSavedSubscription = this.fileService.onFileSaved.subscribe(() => {
+        this.compile();
+      });
+      this.compilationSubscription = this.compilerService.onCompilationRequested.subscribe(() => {
         this.compile();
       });
     });

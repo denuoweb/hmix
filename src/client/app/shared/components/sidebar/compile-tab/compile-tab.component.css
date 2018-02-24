@@ -23,15 +23,29 @@
   padding: 10px;
 }
 
+.main-container {
+  height: calc(100% - 20px);
+  display: block;
+  position: relative;
+}
+
+.errors-container {
+  height: calc(100% - 45px);
+  overflow-y: overlay;
+}
+
 .compilation-error {
   font-size: 14px;
   padding: 15px 30px;
-  margin-bottom: 2px;
   -webkit-transition: all 500ms ease;
   -moz-transition: all 500ms ease;
   -ms-transition: all 500ms ease;
   -o-transition: all 500ms ease;
   transition: all 500ms ease;
+}
+
+.compilation-error:not(:last-child) {
+  margin-bottom: 2px;
 }
 
 .compilation-error pre {
@@ -40,6 +54,7 @@
 
 .compilation-error:hover {
   background-color: rgba(255, 255, 255, 0.05);
+  color: white;
   cursor: pointer;
 }
 
