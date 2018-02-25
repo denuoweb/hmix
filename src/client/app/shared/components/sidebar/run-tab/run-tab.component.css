@@ -15,7 +15,7 @@
 }
 
 .contracts {
-  height: calc(100% - 220px);
+  height: calc(100% - 262px);
   overflow-y: overlay;
   overflow-x: hidden;
   display: block;
@@ -116,4 +116,20 @@
   max-width: calc(100% - 35px);
   white-space: nowrap;
   overflow: hidden;
+}
+
+.loading-indicator {
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.loading-indicator span {
+  margin-bottom: 10px;
+  display: block;
+}
+
+.last-error {
+  padding: 10px;
+  background-color: rgba(217, 81, 79, 0.67);
+  margin-bottom: 25px;
 }

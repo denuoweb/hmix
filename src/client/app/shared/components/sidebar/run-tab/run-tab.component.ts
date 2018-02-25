@@ -7,6 +7,7 @@ import { ICompilerContract } from '../../../models/compiler-result.model';
 // Services
 import { CompilerService } from '../../../services/compiler/compiler.service';
 import { QtumService } from '../../../services/qtum/qtum.service';
+import { TerminalService } from '../../../services/terminal/terminal.service';
 
 // External imports
 import { qtumjs } from '../../../globals';
@@ -20,15 +21,23 @@ import { qtumjs } from '../../../globals';
 export class RunTabComponent implements OnInit {
   private _constructorArgs: string;
   private selectedContract: ICompilerContract;
+  private compilationStartedSub: Subscription;
   private compilationFinishedSub: Subscription;
   private _loadedContracts: any[] = [];
+  private _compiling = true;
+  private _lastError: string;
 
   constructor(private compilerService: CompilerService,
-              private qtumService: QtumService) { }
+              private qtumService: QtumService,
+              private terminalService: TerminalService) { }
 
   ngOnInit() {
+    this.compilationStartedSub = this.compilerService.onCompilationStarted.subscribe(() => {
+      this._compiling = true;
+    });
     this.compilationFinishedSub = this.compilerService.onCompilationFinished.subscribe(() => {
       this.selectedContract = this.contracts[0];
+      this._compiling = false;
     });
   }
 
@@ -49,18 +58,39 @@ export class RunTabComponent implements OnInit {
 
     const args = this.constructorArgs ? this.constructorArgs.split(',') : [];
 
+    this.terminalService.log(`Deploying: ${contract.name} (waiting for approval)`);
     contract.deploy(args, {
       bytecode: this.selectedContract.evm.bytecode.object
     }).then((result: any) => {
+      this.terminalService.log(`Deployed ${contract.name} @${contract.address}`);
       this._loadedContracts.push(contract);
+    }).catch((err: any) => {
+      console.log(err);
+      this.terminalService.log(err);
     });
   }
 
   callOrSend(contract: any, fn: any): void {
     const args = fn.args ? fn.args.split(',') : [];
-    const transactionType = fn.constant ? contract.call : contract.send;
-    transactionType.call(contract, fn.name, args).then((result: any) => {
-      console.log(result);
+
+    let transactionType;
+    if (fn.constant) {
+      this.terminalService.log(`Calling method: ${fn.name}`);
+      transactionType = contract.call;
+    } else {
+      this.terminalService.log(`Calling method: ${fn.name} (waiting for approval)`);
+      transactionType = contract.send;
+    }
+
+    transactionType.call(contract, fn.name, args).then((tx: any) => {
+      if (fn.constant) {
+        this.terminalService.log(`Outputs: ${tx.outputs}`);
+      } else {
+        this.terminalService.log(`TXID: ${tx.txid}`);
+      }
+    }).catch((err: any) => {
+      console.log(err);
+      this.terminalService.log(err);
     });
   }
 
@@ -119,5 +149,13 @@ export class RunTabComponent implements OnInit {
 
   get loadedContracts(): any[] {
     return this._loadedContracts;
+  }
+
+  get compiling(): boolean {
+    return this._compiling;
+  }
+
+  get lastError(): string {
+    return this._lastError;
   }
 }

@@ -20,6 +20,11 @@
   <a class="waves-effect waves-light btn deploy-button" (click)="deploy()">Deploy</a>
 </div>
 
+<div *ngIf="compiling" class="loading-indicator center-align">
+  <span *ngIf="compiling">Compiling</span>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
 <div class="contracts">
   <div *ngFor="let contract of loadedContracts" class="contract-container">
     <span class="contract-name" (click)="toggleExpand(contract)">{{ contract.name }} @{{ contract.address }}</span>

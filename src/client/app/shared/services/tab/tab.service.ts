@@ -22,12 +22,6 @@ export class TabService {
       displayName: 'Run',
       icon: 'fa-play',
       active: false
-    },
-    {
-      name: 'settings',
-      displayName: 'Settings',
-      icon: 'fa-cog',
-      active: false
     }
   ];
 

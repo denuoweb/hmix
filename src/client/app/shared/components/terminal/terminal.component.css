@@ -4,3 +4,15 @@
   width: 100%;
   display: block;
 }
+
+.terminal-logs {
+  height: 100%;
+  width: 100%;
+  display: block;
+  overflow-y: overlay;
+}
+
+.terminal-log {
+  color: white;
+  padding: 10px;
+}

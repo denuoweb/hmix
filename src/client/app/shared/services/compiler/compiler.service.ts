@@ -19,6 +19,7 @@ import { STORAGE_KEYS } from '../../constants/storage-keys';
 @Injectable()
 export class CompilerService {
   onCompilationRequested: EventEmitter<void> = new EventEmitter<void>();
+  onCompilationStarted: EventEmitter<void> = new EventEmitter<void>();
   onCompilationFinished: EventEmitter<void> = new EventEmitter<void>();
   private compilerWorkerScriptUrl = '/app/shared/services/compiler/worker.js';
   private webWorker: Worker;
@@ -43,7 +44,7 @@ export class CompilerService {
     }
   }, retry = true): Promise<ICompilerResult> {
     const compilationPromise = this.useWebWorker ? this.compileWebWorker(sources) : this.compileSync(sources);
-
+    this.onCompilationStarted.emit();
     return new Promise<ICompilerResult>((resolve, reject) => {
       compilationPromise.then((result) => {
         if (result.missingInputs) {

@@ -4,6 +4,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { File } from '../../../models/file.model';
 
 // Services
+import { CompilerService } from '../../../services/compiler/compiler.service';
 import { FileService } from '../../../services/file/file.service';
 
 @Component({
@@ -17,7 +18,8 @@ export class FileTabComponent implements AfterViewInit {
   isRenamingFile = false;
   fileToBeRenamed: File;
 
-  constructor(private fileService: FileService) { }
+  constructor(private fileService: FileService,
+              private compilerService: CompilerService) { }
 
   ngAfterViewInit() {
     this.watchInputClick();
@@ -29,6 +31,7 @@ export class FileTabComponent implements AfterViewInit {
 
   openFile(file: File): void {
     this.fileService.openFile(file);
+    this.compilerService.requestCompilation();
   }
 
   deleteFile(file: File): void {

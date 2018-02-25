@@ -46,7 +46,7 @@ export class HomeComponent implements OnInit {
     });
     this.terminalOpenSub = this.terminalService.onTerminalOpenRequest.subscribe(() => {
       if (this.terminalHeight < this.minTerminalHeight) {
-        this.terminalHeight = this.defaultTerminalHeight;
+        this.terminalHeight = this.minTerminalHeight;
       }
     });
   }
