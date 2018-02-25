@@ -8,6 +8,14 @@
   height: 20px;
   line-height: 20px;
   font-size: 10px;
+  position: relative
+}
+
+.new-file-btn {
+  position: absolute;
+  right: 10px;
+  top: 4px;
+  cursor: pointer;
 }
 
 .files-container {

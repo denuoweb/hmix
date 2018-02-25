@@ -55,6 +55,9 @@ export class FileTabComponent implements AfterViewInit {
 
   private watchInputClick(): void {
     document.addEventListener('click', (event: MouseEvent) => {
+      if ((<any>event.target).id === 'new-file-btn') {
+        return;
+      }
       this.finishEditingFile(event);
     });
     document.addEventListener('contextmenu', (event: MouseEvent) => {
