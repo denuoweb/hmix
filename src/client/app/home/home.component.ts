@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs/Subscription';
 // Services
 import { TabService } from '../shared/services/tab/tab.service';
 import { StorageService } from '../shared/services/storage/storage.service';
+import { TerminalService } from '../shared/services/terminal/terminal.service';
 
 // Constants
 import { STORAGE_KEYS } from '../shared/constants/storage-keys';
@@ -27,17 +28,25 @@ export class HomeComponent implements OnInit {
   private lastX: number;
   private lastY: number;
   private tabChangeSubscription: Subscription;
+  private terminalOpenSub: Subscription;
 
   constructor(private changeDetector: ChangeDetectorRef,
               private storageService: StorageService,
-              private tabService: TabService) { }
+              private tabService: TabService,
+              private terminalService: TerminalService) { }
 
   ngOnInit() {
     this.sidebarWidth = this.storageService.get(STORAGE_KEYS['sidebarWidth']) || this.defaultSidebarWidth;
     this.terminalHeight = this.defaultTerminalHeight;
+
     this.tabChangeSubscription = this.tabService.onActiveTabChange.subscribe(() => {
       if (this.sidebarWidth < this.minSidebarWidth) {
         this.sidebarWidth = this.defaultSidebarWidth;
+      }
+    });
+    this.terminalOpenSub = this.terminalService.onTerminalOpenRequest.subscribe(() => {
+      if (this.terminalHeight < this.minTerminalHeight) {
+        this.terminalHeight = this.defaultTerminalHeight;
       }
     });
   }
@@ -64,7 +73,6 @@ export class HomeComponent implements OnInit {
       // Calculate a new height
       if (currentY < this.windowHeight - this.minTerminalHeight) {
         const newHeight = this.terminalHeight - currentY + this.lastY;
-        console.log(newHeight);
         this.terminalHeight = Math.min(Math.max(newHeight, this.minTerminalHeight), this.maxTerminalHeight);
       } else {
         this.terminalHeight = 0;
@@ -127,12 +135,12 @@ export class HomeComponent implements OnInit {
   }
 
   private get windowHeight(): number {
-    return document.documentElement.clientHeight
-      || document.body.clientHeight;
+    return document.documentElement.getBoundingClientRect().height
+      || document.body.getBoundingClientRect().height;
   }
 
   private get windowWidth(): number {
-    return document.documentElement.clientWidth
-      || document.body.clientWidth;
+    return document.documentElement.getBoundingClientRect().width
+      || document.body.getBoundingClientRect().width;
   }
 }

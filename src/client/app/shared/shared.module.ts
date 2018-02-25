@@ -22,6 +22,7 @@ import { TabService } from './services/tab/tab.service';
 import { CompilerService } from './services/compiler/compiler.service';
 import { SolcVersionsService } from './services/solc-versions/solc-versions.service';
 import { QtumService } from './services/qtum/qtum.service';
+import { TerminalService } from './services/terminal/terminal.service';
 
 // Material imports
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -74,7 +75,8 @@ export class SharedModule {
         TabService,
         CompilerService,
         SolcVersionsService,
-        QtumService
+        QtumService,
+        TerminalService
       ]
     };
   }
