@@ -95,3 +95,9 @@
 .error-type-error {
   background-color: rgba(217, 81, 79, 0.67);
 }
+
+.loading-indicator span {
+  margin-bottom: 10px;
+  display: block;
+  color: white;
+}

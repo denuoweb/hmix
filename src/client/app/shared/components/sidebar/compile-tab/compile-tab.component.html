@@ -1,6 +1,7 @@
 <div *ngIf="compilerVersion" class="compiler-version">Solc Version: {{ compilerVersion }}</div>
 
-<div *ngIf="loadingCompiler" class="loading-indicator">
+<div *ngIf="loadingCompiler" class="loading-indicator center-align">
+    <span>Loading Compiler</span>
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>
 
@@ -22,7 +23,8 @@
     </div>
   </div>
 
-  <div *ngIf="compiling" class="loading-indicator">
+  <div *ngIf="compiling" class="loading-indicator center-align">
+    <span>Compiling</span>
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
 

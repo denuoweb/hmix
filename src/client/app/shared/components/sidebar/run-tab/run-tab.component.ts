@@ -82,11 +82,25 @@ export class RunTabComponent implements OnInit {
       transactionType = contract.send;
     }
 
+    const logEvents = (tx: any) => {
+      tx.logs.forEach((log: any) => {
+        let eventData = '';
+        for (const property in log) {
+          eventData += '\n' + `${property}: ${log[property]}`;
+        }
+        this.terminalService.log(`Event Occurred: ${eventData}`);
+      });
+    };
+
     transactionType.call(contract, fn.name, args).then((tx: any) => {
       if (fn.constant) {
         this.terminalService.log(`Outputs: ${tx.outputs}`);
+        logEvents(tx);
       } else {
         this.terminalService.log(`TXID: ${tx.txid}`);
+        tx.confirm(1).then((receipt: any) => {
+          logEvents(receipt);
+        });
       }
     }).catch((err: any) => {
       console.log(err);
