@@ -22,6 +22,12 @@ export class TabService {
       displayName: 'Run',
       icon: 'fa-play',
       active: false
+    },
+    {
+      name: 'help',
+      displayName: 'Help',
+      icon: 'fa-question-circle',
+      active: false
     }
   ];
 

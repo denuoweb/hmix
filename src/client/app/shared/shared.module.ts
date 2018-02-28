@@ -11,6 +11,7 @@ import { EditorComponent } from './components/editor/editor.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FileTabComponent } from './components/sidebar/file-tab/file-tab.component';
 import { CompileTabComponent } from './components/sidebar/compile-tab/compile-tab.component';
+import { HelpTabComponent } from './components/sidebar/help-tab/help-tab.component';
 import { RunTabComponent } from './components/sidebar/run-tab/run-tab.component';
 import { TabsComponent } from './components/tabs/tabs.component';
 
@@ -49,6 +50,7 @@ import { MatProgressBarModule, MatSelectModule } from '@angular/material';
     FileTabComponent,
     CompileTabComponent,
     RunTabComponent,
+    HelpTabComponent,
     TerminalComponent
   ],
   exports: [
@@ -59,6 +61,7 @@ import { MatProgressBarModule, MatSelectModule } from '@angular/material';
     CompileTabComponent,
     TerminalComponent,
     RunTabComponent,
+    HelpTabComponent,
     CommonModule,
     FormsModule,
     RouterModule

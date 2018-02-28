@@ -1,0 +1,6 @@
+:host {
+  color: white;
+  padding: 10px;
+  display: block;
+  overflow-y: overlay !important;
+}
