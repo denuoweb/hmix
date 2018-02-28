@@ -29,6 +29,10 @@
   </div>
 
   <div *ngIf="!compiling" class="errors-container">
+    <div *ngIf="errors.length === 0" class="compilation-error error-noerror">
+      Everything looks good!
+    </div>
+
     <div *ngFor="let error of errors" class="compilation-error error-type-{{ parseErrorType(error.errorType) }} noselect" (click)="gotoError(error)">
       <div *ngIf="error.lineNumber">{{ error.fileName }}:{{ error.lineNumber }}:{{ error.columnNumber }}: {{ error.errorType }}:</div>
       <div *ngIf="!error.lineNumber">{{ error.errorType }}:</div>

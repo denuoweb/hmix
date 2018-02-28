@@ -1,24 +1,32 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.qtumjs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-var __rest = (this && this.__rest) || function (s, e) {
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var __rest = undefined && undefined.__rest || function (s, e) {
     var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
-            t[p[i]] = s[p[i]];
-    return t;
+    for (var p in s) {
+        if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0) t[p] = s[p];
+    }if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+        if (e.indexOf(p[i]) < 0) t[p[i]] = s[p[i]];
+    }return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const eventemitter3_1 = require("eventemitter3");
-const { logDecoder, } = require("qtumjs-ethjs-abi");
-const abi_1 = require("./abi");
-const TxReceiptPromise_1 = require("./TxReceiptPromise");
-const MethodMap_1 = require("./MethodMap");
+var eventemitter3_1 = require("eventemitter3");
+
+var _require = require("qtumjs-ethjs-abi"),
+    logDecoder = _require.logDecoder;
+
+var abi_1 = require("./abi");
+var TxReceiptPromise_1 = require("./TxReceiptPromise");
+var MethodMap_1 = require("./MethodMap");
 /**
  * Contract represents a Smart Contract deployed on the blockchain.
  */
-class Contract {
+
+var Contract = function () {
     /**
      * Create a Contract
      *
@@ -28,7 +36,11 @@ class Contract {
      *      address, owner address, and ABI definition for methods and types.
      * @param opts - init options
      */
-    constructor(rpc, info, opts = {}) {
+    function Contract(rpc, info) {
+        var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+        _classCallCheck(this, Contract);
+
         this.rpc = rpc;
         this.info = info;
         this.abi = info.abi;
@@ -37,354 +49,596 @@ class Contract {
         this._logDecoder = opts.logDecoder || new abi_1.ContractLogDecoder(this.info.abi);
         this._useBigNumber = false;
     }
-    encodeParams(method, args = []) {
-        const methodABI = this.methodMap.findMethod(method, args);
-        if (!methodABI) {
-            throw new Error(`Unknown method to call: ${method}`);
-        }
-        return abi_1.encodeInputs(methodABI, args);
-    }
-    /**
-     * Call a contract method using ABI encoding, and return the RPC result as is.
-     * This does not create a transaction. It is useful for gas estimation or
-     * getting results from read-only methods.
-     *
-     * @param method name of contract method to call
-     * @param args arguments
-     */
-    async rawCall(method, args = [], opts = {}) {
-        const calldata = this.encodeParams(method, args);
-        return this.rpc.callContract(Object.assign({ address: this.address, datahex: calldata, senderAddress: opts.senderAddress || this.info.sender }, opts));
-    }
-    /**
-     * Creates a transaction that deploys this contract given some input parameters.
-     * This requires network consensus and costs you gas.
-     *
-     * @param params contract creation input arguments
-     */
-    async deploy(params = [], opts = {}) {
-        const calldata = abi_1.encodeConstructorParams(this.abi, params);
-        const result = await this.rpc.createContract(Object.assign({}, opts, { bytecode: opts.bytecode + calldata, senderAddress: opts.senderAddress || '' }));
-        this.address = result.address;
-        return result;
-    }
-    /**
-     * Executes contract method on your own local qtumd node as a "simulation"
-     * using `callcontract`. It is free, and does not actually modify the
-     * blockchain.
-     *
-     * @param method Name of the contract method
-     * @param args Arguments for calling the method
-     * @param opts call options
-     */
-    async call(method, args = [], opts = {}) {
-        const r = await this.rawCall(method, args, opts);
-        const exception = r.executionResult.excepted;
-        if (exception !== "None") {
-            throw new Error(`Call exception: ${exception}`);
-        }
-        const output = r.executionResult.output;
-        let decodedOutputs = [];
-        if (output !== "") {
-            const methodABI = this.methodMap.findMethod(method, args);
-            decodedOutputs = abi_1.decodeOutputs(methodABI, output);
-        }
-        const decodedLogs = r.transactionReceipt.log.map((rawLog) => {
-            return this.logDecoder.decode(rawLog);
-        });
-        return Object.assign(r, {
-            outputs: decodedOutputs,
-            logs: decodedLogs,
-        });
-    }
-    /**
-     * Call a method, and return only the first return value of the method. This
-     * is a convenient syntatic sugar to get the return value when there is only
-     * one.
-     *
-     * @param method Name of the contract method
-     * @param args Arguments for calling the method
-     * @param opts call options
-     */
-    async return(method, args = [], opts = {}) {
-        const result = await this.call(method, args, opts);
-        const val = result.outputs[0];
-        // Convert big number to JavaScript number
-        // FIXME: It'd be better to support this consistently at the ABI decoding level.
-        if (!this._useBigNumber && typeof val.toNumber === "function") {
-            return val.toNumber();
-        }
-        return val;
-    }
-    /**
-     * Call a method, and return the first return value as Date. It is assumed
-     * that the returned value is unix second.
-     *
-     * @param method
-     * @param args
-     * @param opts
-     */
-    async returnDate(method, args = [], opts = {}) {
-        const result = await this.return(method, args, opts);
-        if (typeof result !== "number") {
-            throw Error("Cannot convert return value to Date. Expect return value to be a number.");
-        }
-        return new Date(result * 1000);
-    }
-    /**
-     * Call a method, and return the first return value (a uint). Convert the value to
-     * the desired currency unit.
-     *
-     * @param targetBase The currency unit to convert to. If a number, it is
-     * treated as the power of 10. -8 is satoshi. 0 is the canonical unit.
-     * @param method
-     * @param args
-     * @param opts
-     */
-    async returnCurrency(targetBase, method, args = [], opts = {}) {
-        const value = await this.return(method, args, opts);
-        if (typeof value !== "number") {
-            throw Error("Cannot convert return value to currency unit. Expect return value to be a number.");
-        }
-        let base = 0;
-        if (typeof targetBase === "number") {
-            base = targetBase;
-        }
-        else {
-            switch (targetBase) {
-                case "qtum":
-                case "btc":
-                    base = 0;
-                    break;
-                case "sat":
-                case "satoshi":
-                    base = -8;
-                default:
-                    throw Error(`Unknown base currency unit: ${targetBase}`);
+
+    _createClass(Contract, [{
+        key: "encodeParams",
+        value: function encodeParams(method) {
+            var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+            var methodABI = this.methodMap.findMethod(method, args);
+            if (!methodABI) {
+                throw new Error("Unknown method to call: " + method);
             }
+            return abi_1.encodeInputs(methodABI, args);
         }
-        const satoshi = 1e-8;
-        return value / satoshi * (10 ** base);
-    }
-    async returnAs(converter, method, args = [], opts = {}) {
-        const value = await this.return(method, args, opts);
-        return await converter(value);
-    }
-    /**
-     * Create a transaction that calls a method using ABI encoding, and return the
-     * RPC result as is. A transaction will require network consensus to confirm,
-     * and costs you gas.
-     *
-     * @param method name of contract method to call
-     * @param args arguments
-     */
-    async rawSend(method, args, opts = {}) {
-        // TODO opts: gas limit, gas price, sender address
-        const methodABI = this.methodMap.findMethod(method, args);
-        if (methodABI == null) {
-            throw new Error(`Unknown method to send: ${method}`);
+        /**
+         * Call a contract method using ABI encoding, and return the RPC result as is.
+         * This does not create a transaction. It is useful for gas estimation or
+         * getting results from read-only methods.
+         *
+         * @param method name of contract method to call
+         * @param args arguments
+         */
+
+    }, {
+        key: "rawCall",
+        value: async function rawCall(method) {
+            var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+            var calldata = this.encodeParams(method, args);
+            return this.rpc.callContract(Object.assign({ address: this.address, datahex: calldata, senderAddress: opts.senderAddress || this.info.sender }, opts));
         }
-        if (methodABI.constant) {
-            throw new Error(`cannot send to a constant method: ${method}`);
+        /**
+         * Creates a transaction that deploys this contract given some input parameters.
+         * This requires network consensus and costs you gas.
+         *
+         * @param params contract creation input arguments
+         */
+
+    }, {
+        key: "deploy",
+        value: async function deploy() {
+            var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+            var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var calldata = abi_1.encodeConstructorParams(this.abi, params);
+            var result = await this.rpc.createContract(Object.assign({}, opts, { bytecode: opts.bytecode + calldata, senderAddress: opts.senderAddress || '' }));
+            this.address = result.address;
+            return result;
         }
-        const calldata = abi_1.encodeInputs(methodABI, args);
-        return this.rpc.sendToContract(Object.assign({ address: this.address, datahex: calldata, senderAddress: opts.senderAddress || this.info.sender }, opts));
-    }
-    /**
-     * Confirms an in-wallet transaction, and return the receipt.
-     *
-     * @param txid transaction id. Must be an in-wallet transaction
-     * @param confirm how many confirmations to ensure
-     * @param onConfirm callback that receives the receipt for each additional confirmation
-     */
-    async confirm(txid, confirm, onConfirm) {
-        const txrp = new TxReceiptPromise_1.TxReceiptPromise(this.rpc, txid);
-        if (onConfirm) {
-            txrp.onConfirm((tx2, receipt2) => {
-                const sendTxReceipt = this._makeSendTxReceipt(receipt2);
-                onConfirm(tx2, sendTxReceipt);
+        /**
+         * Executes contract method on your own local qtumd node as a "simulation"
+         * using `callcontract`. It is free, and does not actually modify the
+         * blockchain.
+         *
+         * @param method Name of the contract method
+         * @param args Arguments for calling the method
+         * @param opts call options
+         */
+
+    }, {
+        key: "call",
+        value: async function call(method) {
+            var _this = this;
+
+            var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+            var r = await this.rawCall(method, args, opts);
+            var exception = r.executionResult.excepted;
+            if (exception !== "None") {
+                throw new Error("Call exception: " + exception);
+            }
+            var output = r.executionResult.output;
+            var decodedOutputs = [];
+            if (output !== "") {
+                var methodABI = this.methodMap.findMethod(method, args);
+                decodedOutputs = abi_1.decodeOutputs(methodABI, output);
+            }
+            var decodedLogs = r.transactionReceipt.log.map(function (rawLog) {
+                return _this.logDecoder.decode(rawLog);
+            });
+            return Object.assign(r, {
+                outputs: decodedOutputs,
+                logs: decodedLogs
             });
         }
-        const receipt = await txrp.confirm(confirm);
-        return this._makeSendTxReceipt(receipt);
-    }
-    /**
-     * Returns the receipt for a transaction, with decoded event logs.
-     *
-     * @param txid transaction id. Must be an in-wallet transaction
-     * @returns The receipt, or null if transaction is not yet confirmed.
-     */
-    async receipt(txid) {
-        const receipt = await this.rpc.getTransactionReceipt({ txid });
-        if (!receipt) {
-            return null;
-        }
-        return this._makeSendTxReceipt(receipt);
-    }
-    async send(method, args = [], opts = {}) {
-        const methodABI = this.methodMap.findMethod(method, args);
-        if (methodABI == null) {
-            throw new Error(`Unknown method to send: ${method}`);
-        }
-        if (methodABI.constant) {
-            throw new Error(`cannot send to a constant method: ${method}`);
-        }
-        const calldata = abi_1.encodeInputs(methodABI, args);
-        const sent = await this.rpc.sendToContract(Object.assign({ datahex: calldata, address: this.address, senderAddress: opts.senderAddress || this.info.sender }, opts));
-        const txid = sent.txid;
-        const txinfo = await this.rpc.getTransaction({ txid });
-        const sendTx = Object.assign({}, txinfo, { method, confirm: (n, handler) => {
-                return this.confirm(txid, n, handler);
-            } });
-        return sendTx;
-    }
-    /**
-     * Get contract event logs, up to the latest block. By default, it starts looking
-     * for logs from the beginning of the blockchain.
-     * @param req
-     */
-    async logs(req = {}) {
-        return this.waitLogs(Object.assign({ fromBlock: 0, toBlock: "latest" }, req));
-    }
-    /**
-     * Get contract event logs. Long-poll wait if no log is found.
-     * @param req (optional) IRPCWaitForLogsRequest
-     */
-    async waitLogs(req = {}) {
-        const filter = req.filter || {};
-        if (!filter.addresses) {
-            filter.addresses = [this.address];
-        }
-        const result = await this.rpc.waitforlogs(Object.assign({}, req, { filter }));
-        const entries = result.entries.map((entry) => {
-            const parsedLog = this.logDecoder.decode(entry);
-            return Object.assign({}, entry, { event: parsedLog });
-        });
-        return Object.assign({}, result, { entries });
-    }
-    /**
-     * Subscribe to contract's events, using callback interface.
-     */
-    onLog(fn, opts = {}) {
-        let nextblock = opts.fromBlock || "latest";
-        const loop = async () => {
-            while (true) {
-                const result = await this.waitLogs(Object.assign({}, opts, { fromBlock: nextblock }));
-                for (const entry of result.entries) {
-                    fn(entry);
-                }
-                nextblock = result.nextblock;
+        /**
+         * Call a method, and return only the first return value of the method. This
+         * is a convenient syntatic sugar to get the return value when there is only
+         * one.
+         *
+         * @param method Name of the contract method
+         * @param args Arguments for calling the method
+         * @param opts call options
+         */
+
+    }, {
+        key: "return",
+        value: async function _return(method) {
+            var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+            var result = await this.call(method, args, opts);
+            var val = result.outputs[0];
+            // Convert big number to JavaScript number
+            // FIXME: It'd be better to support this consistently at the ABI decoding level.
+            if (!this._useBigNumber && typeof val.toNumber === "function") {
+                return val.toNumber();
             }
-        };
-        loop();
-    }
-    /**
-     * Subscribe to contract's events, use EventsEmitter interface.
-     */
-    logEmitter(opts = {}) {
-        const emitter = new eventemitter3_1.EventEmitter();
-        this.onLog((entry) => {
-            const key = (entry.event && entry.event.type) || "?";
-            emitter.emit(key, entry);
-        }, opts);
-        return emitter;
-    }
-    get logDecoder() {
-        return this._logDecoder;
-    }
-    _makeSendTxReceipt(receipt) {
-        // https://stackoverflow.com/a/34710102
-        // ...receiptNoLog will be a copy of receipt, without the `log` property
-        const { log: rawlogs } = receipt, receiptNoLog = __rest(receipt, ["log"]);
-        const logs = rawlogs.map((rawLog) => this.logDecoder.decode(rawLog));
-        return Object.assign({}, receiptNoLog, { logs,
-            rawlogs });
-    }
-}
+            return val;
+        }
+        /**
+         * Call a method, and return the first return value as Date. It is assumed
+         * that the returned value is unix second.
+         *
+         * @param method
+         * @param args
+         * @param opts
+         */
+
+    }, {
+        key: "returnDate",
+        value: async function returnDate(method) {
+            var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+            var result = await this.return(method, args, opts);
+            if (typeof result !== "number") {
+                throw Error("Cannot convert return value to Date. Expect return value to be a number.");
+            }
+            return new Date(result * 1000);
+        }
+        /**
+         * Call a method, and return the first return value (a uint). Convert the value to
+         * the desired currency unit.
+         *
+         * @param targetBase The currency unit to convert to. If a number, it is
+         * treated as the power of 10. -8 is satoshi. 0 is the canonical unit.
+         * @param method
+         * @param args
+         * @param opts
+         */
+
+    }, {
+        key: "returnCurrency",
+        value: async function returnCurrency(targetBase, method) {
+            var args = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+            var opts = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+            var value = await this.return(method, args, opts);
+            if (typeof value !== "number") {
+                throw Error("Cannot convert return value to currency unit. Expect return value to be a number.");
+            }
+            var base = 0;
+            if (typeof targetBase === "number") {
+                base = targetBase;
+            } else {
+                switch (targetBase) {
+                    case "qtum":
+                    case "btc":
+                        base = 0;
+                        break;
+                    case "sat":
+                    case "satoshi":
+                        base = -8;
+                    default:
+                        throw Error("Unknown base currency unit: " + targetBase);
+                }
+            }
+            var satoshi = 1e-8;
+            return value / satoshi * 10 ** base;
+        }
+    }, {
+        key: "returnAs",
+        value: async function returnAs(converter, method) {
+            var args = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+            var opts = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+            var value = await this.return(method, args, opts);
+            return await converter(value);
+        }
+        /**
+         * Create a transaction that calls a method using ABI encoding, and return the
+         * RPC result as is. A transaction will require network consensus to confirm,
+         * and costs you gas.
+         *
+         * @param method name of contract method to call
+         * @param args arguments
+         */
+
+    }, {
+        key: "rawSend",
+        value: async function rawSend(method, args) {
+            var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+            // TODO opts: gas limit, gas price, sender address
+            var methodABI = this.methodMap.findMethod(method, args);
+            if (methodABI == null) {
+                throw new Error("Unknown method to send: " + method);
+            }
+            if (methodABI.constant) {
+                throw new Error("cannot send to a constant method: " + method);
+            }
+            var calldata = abi_1.encodeInputs(methodABI, args);
+            return this.rpc.sendToContract(Object.assign({ address: this.address, datahex: calldata, senderAddress: opts.senderAddress || this.info.sender }, opts));
+        }
+        /**
+         * Confirms an in-wallet transaction, and return the receipt.
+         *
+         * @param txid transaction id. Must be an in-wallet transaction
+         * @param confirm how many confirmations to ensure
+         * @param onConfirm callback that receives the receipt for each additional confirmation
+         */
+
+    }, {
+        key: "confirm",
+        value: async function confirm(txid, _confirm, onConfirm) {
+            var _this2 = this;
+
+            var txrp = new TxReceiptPromise_1.TxReceiptPromise(this.rpc, txid);
+            if (onConfirm) {
+                txrp.onConfirm(function (tx2, receipt2) {
+                    var sendTxReceipt = _this2._makeSendTxReceipt(receipt2);
+                    onConfirm(tx2, sendTxReceipt);
+                });
+            }
+            var receipt = await txrp.confirm(_confirm);
+            return this._makeSendTxReceipt(receipt);
+        }
+        /**
+         * Returns the receipt for a transaction, with decoded event logs.
+         *
+         * @param txid transaction id. Must be an in-wallet transaction
+         * @returns The receipt, or null if transaction is not yet confirmed.
+         */
+
+    }, {
+        key: "receipt",
+        value: async function receipt(txid) {
+            var receipt = await this.rpc.getTransactionReceipt({ txid: txid });
+            if (!receipt) {
+                return null;
+            }
+            return this._makeSendTxReceipt(receipt);
+        }
+    }, {
+        key: "send",
+        value: async function send(method) {
+            var _this3 = this;
+
+            var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+            var methodABI = this.methodMap.findMethod(method, args);
+            if (methodABI == null) {
+                throw new Error("Unknown method to send: " + method);
+            }
+            if (methodABI.constant) {
+                throw new Error("cannot send to a constant method: " + method);
+            }
+            var calldata = abi_1.encodeInputs(methodABI, args);
+            var sent = await this.rpc.sendToContract(Object.assign({ datahex: calldata, address: this.address, senderAddress: opts.senderAddress || this.info.sender }, opts));
+            var txid = sent.txid;
+            var txinfo = await this.rpc.getTransaction({ txid: txid });
+            var sendTx = Object.assign({}, txinfo, { method: method, confirm: function confirm(n, handler) {
+                    return _this3.confirm(txid, n, handler);
+                } });
+            return sendTx;
+        }
+        /**
+         * Get contract event logs, up to the latest block. By default, it starts looking
+         * for logs from the beginning of the blockchain.
+         * @param req
+         */
+
+    }, {
+        key: "logs",
+        value: async function logs() {
+            var req = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            return this.waitLogs(Object.assign({ fromBlock: 0, toBlock: "latest" }, req));
+        }
+        /**
+         * Get contract event logs. Long-poll wait if no log is found.
+         * @param req (optional) IRPCWaitForLogsRequest
+         */
+
+    }, {
+        key: "waitLogs",
+        value: async function waitLogs() {
+            var _this4 = this;
+
+            var req = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            var filter = req.filter || {};
+            if (!filter.addresses) {
+                filter.addresses = [this.address];
+            }
+            var result = await this.rpc.waitforlogs(Object.assign({}, req, { filter: filter }));
+            var entries = result.entries.map(function (entry) {
+                var parsedLog = _this4.logDecoder.decode(entry);
+                return Object.assign({}, entry, { event: parsedLog });
+            });
+            return Object.assign({}, result, { entries: entries });
+        }
+        /**
+         * Subscribe to contract's events, using callback interface.
+         */
+
+    }, {
+        key: "onLog",
+        value: function onLog(fn) {
+            var _this5 = this;
+
+            var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var nextblock = opts.fromBlock || "latest";
+            var loop = async function loop() {
+                while (true) {
+                    var result = await _this5.waitLogs(Object.assign({}, opts, { fromBlock: nextblock }));
+                    var _iteratorNormalCompletion = true;
+                    var _didIteratorError = false;
+                    var _iteratorError = undefined;
+
+                    try {
+                        for (var _iterator = result.entries[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var entry = _step.value;
+
+                            fn(entry);
+                        }
+                    } catch (err) {
+                        _didIteratorError = true;
+                        _iteratorError = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
+                            }
+                        } finally {
+                            if (_didIteratorError) {
+                                throw _iteratorError;
+                            }
+                        }
+                    }
+
+                    nextblock = result.nextblock;
+                }
+            };
+            loop();
+        }
+        /**
+         * Subscribe to contract's events, use EventsEmitter interface.
+         */
+
+    }, {
+        key: "logEmitter",
+        value: function logEmitter() {
+            var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            var emitter = new eventemitter3_1.EventEmitter();
+            this.onLog(function (entry) {
+                var key = entry.event && entry.event.type || "?";
+                emitter.emit(key, entry);
+            }, opts);
+            return emitter;
+        }
+    }, {
+        key: "_makeSendTxReceipt",
+        value: function _makeSendTxReceipt(receipt) {
+            var _this6 = this;
+
+            // https://stackoverflow.com/a/34710102
+            // ...receiptNoLog will be a copy of receipt, without the `log` property
+            var rawlogs = receipt.log,
+                receiptNoLog = __rest(receipt, ["log"]);
+            var logs = rawlogs.map(function (rawLog) {
+                return _this6.logDecoder.decode(rawLog);
+            });
+            return Object.assign({}, receiptNoLog, { logs: logs,
+                rawlogs: rawlogs });
+        }
+    }, {
+        key: "logDecoder",
+        get: function get() {
+            return this._logDecoder;
+        }
+    }]);
+
+    return Contract;
+}();
+
 exports.Contract = Contract;
 
 },{"./MethodMap":3,"./TxReceiptPromise":7,"./abi":8,"eventemitter3":37,"qtumjs-ethjs-abi":42}],2:[function(require,module,exports){
 "use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 Object.defineProperty(exports, "__esModule", { value: true });
-const Contract_1 = require("./Contract");
-const abi_1 = require("./abi");
+var Contract_1 = require("./Contract");
+var abi_1 = require("./abi");
 /**
  * ContractsRepo contains the ABI definitions of all known contracts
  */
-class ContractsRepo {
-    constructor(qtum, repoData) {
+
+var ContractsRepo = function () {
+    function ContractsRepo(qtum, repoData) {
+        _classCallCheck(this, ContractsRepo);
+
         this.qtum = qtum;
         this.repoData = repoData;
-        const eventABIs = this.allEventABIs();
+        var eventABIs = this.allEventABIs();
         this.logDecoder = new abi_1.ContractLogDecoder(eventABIs);
     }
-    contract(name) {
-        const info = this.repoData.contracts[name];
-        if (!info) {
-            throw new Error(`cannot find contract: ${name}`);
+
+    _createClass(ContractsRepo, [{
+        key: "contract",
+        value: function contract(name) {
+            var info = this.repoData.contracts[name];
+            if (!info) {
+                throw new Error("cannot find contract: " + name);
+            }
+            // Instantiate the contract with a log decoder that can handle all known events
+            return new Contract_1.Contract(this.qtum, info, { logDecoder: this.logDecoder });
         }
-        // Instantiate the contract with a log decoder that can handle all known events
-        return new Contract_1.Contract(this.qtum, info, { logDecoder: this.logDecoder });
-    }
-    /**
-     *  Combine all known event ABIs into one single array
-     */
-    allEventABIs() {
-        const allEventABIs = [];
-        const { contracts, libraries, related, } = this.repoData;
-        if (contracts) {
-            mergeDefs(contracts);
-        }
-        if (libraries) {
-            mergeDefs(libraries);
-        }
-        if (related) {
-            mergeDefs(related);
-        }
-        return allEventABIs;
-        // inner utility function for allEventABIs
-        function mergeDefs(abiDefs) {
-            for (const key of Object.keys(abiDefs)) {
-                const defs = abiDefs[key].abi;
-                for (const def of defs) {
-                    if (def.type === "event") {
-                        allEventABIs.push(def);
+        /**
+         *  Combine all known event ABIs into one single array
+         */
+
+    }, {
+        key: "allEventABIs",
+        value: function allEventABIs() {
+            var allEventABIs = [];
+            var _repoData = this.repoData,
+                contracts = _repoData.contracts,
+                libraries = _repoData.libraries,
+                related = _repoData.related;
+
+            if (contracts) {
+                mergeDefs(contracts);
+            }
+            if (libraries) {
+                mergeDefs(libraries);
+            }
+            if (related) {
+                mergeDefs(related);
+            }
+            return allEventABIs;
+            // inner utility function for allEventABIs
+            function mergeDefs(abiDefs) {
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = Object.keys(abiDefs)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var key = _step.value;
+
+                        var defs = abiDefs[key].abi;
+                        var _iteratorNormalCompletion2 = true;
+                        var _didIteratorError2 = false;
+                        var _iteratorError2 = undefined;
+
+                        try {
+                            for (var _iterator2 = defs[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                                var def = _step2.value;
+
+                                if (def.type === "event") {
+                                    allEventABIs.push(def);
+                                }
+                            }
+                        } catch (err) {
+                            _didIteratorError2 = true;
+                            _iteratorError2 = err;
+                        } finally {
+                            try {
+                                if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                    _iterator2.return();
+                                }
+                            } finally {
+                                if (_didIteratorError2) {
+                                    throw _iteratorError2;
+                                }
+                            }
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
                     }
                 }
             }
         }
-    }
-}
+    }]);
+
+    return ContractsRepo;
+}();
+
 exports.ContractsRepo = ContractsRepo;
 
 },{"./Contract":1,"./abi":8}],3:[function(require,module,exports){
 "use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Build an index of a contract's ABI definitions.
  */
-class MethodMap {
-    constructor(_methods) {
+
+var MethodMap = function () {
+    function MethodMap(_methods) {
+        _classCallCheck(this, MethodMap);
+
         this.methods = {};
-        const keyCollisions = new Set();
-        for (const method of _methods) {
-            if (method.type !== "function") {
-                continue;
+        var keyCollisions = new Set();
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+            for (var _iterator = _methods[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var method = _step.value;
+
+                if (method.type !== "function") {
+                    continue;
+                }
+                var key = method.name + "#" + method.inputs.length;
+                var sig = method.name + "(" + method.inputs.map(function (input) {
+                    return input.type;
+                }).join(",") + ")";
+                if (this.methods[key]) {
+                    // Detected ambiguity for this arity. User must use method signature
+                    // to select the method.
+                    keyCollisions.add(key);
+                } else {
+                    this.methods[key] = method;
+                }
+                this.methods[sig] = method;
             }
-            const key = `${method.name}#${method.inputs.length}`;
-            const sig = `${method.name}(${method.inputs.map((input) => input.type).join(",")})`;
-            if (this.methods[key]) {
-                // Detected ambiguity for this arity. User must use method signature
-                // to select the method.
-                keyCollisions.add(key);
+        } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                    _iterator.return();
+                }
+            } finally {
+                if (_didIteratorError) {
+                    throw _iteratorError;
+                }
             }
-            else {
-                this.methods[key] = method;
-            }
-            this.methods[sig] = method;
         }
-        for (const key of keyCollisions) {
-            delete this.methods[key];
+
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
+
+        try {
+            for (var _iterator2 = keyCollisions[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                var _key = _step2.value;
+
+                delete this.methods[_key];
+            }
+        } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                    _iterator2.return();
+                }
+            } finally {
+                if (_didIteratorError2) {
+                    throw _iteratorError2;
+                }
+            }
         }
     }
     /**
@@ -399,36 +653,62 @@ class MethodMap {
      *   The method name is `foo`.
      *   The method signature is `foo(uint, uint)`
      */
-    findMethod(selector, args = []) {
-        // Find method by method signature
-        const method = this.methods[selector];
-        if (method) {
-            return method;
+
+
+    _createClass(MethodMap, [{
+        key: "findMethod",
+        value: function findMethod(selector) {
+            var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+            // Find method by method signature
+            var method = this.methods[selector];
+            if (method) {
+                return method;
+            }
+            // Find method by method name
+            var key = selector + "#" + args.length;
+            return this.methods[key];
         }
-        // Find method by method name
-        const key = `${selector}#${args.length}`;
-        return this.methods[key];
-    }
-}
+    }]);
+
+    return MethodMap;
+}();
+
 exports.MethodMap = MethodMap;
 
 },{}],4:[function(require,module,exports){
 "use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 Object.defineProperty(exports, "__esModule", { value: true });
-const QtumRPC_1 = require("./QtumRPC");
-const ContractsRepo_1 = require("./ContractsRepo");
+var QtumRPC_1 = require("./QtumRPC");
+var ContractsRepo_1 = require("./ContractsRepo");
 /**
  * The `Qtum` class is an instance of the `qtumjs` API.
  *
  * @param providerURL URL of the qtumd RPC service.
  * @param repoData Information about Solidity contracts.
  */
-class Qtum extends QtumRPC_1.QtumRPC {
-    constructor(providerURL, repoData) {
-        super(providerURL);
-        this.repo = new ContractsRepo_1.ContractsRepo(this, Object.assign({ 
+
+var Qtum = function (_QtumRPC_1$QtumRPC) {
+    _inherits(Qtum, _QtumRPC_1$QtumRPC);
+
+    function Qtum(providerURL, repoData) {
+        _classCallCheck(this, Qtum);
+
+        var _this = _possibleConstructorReturn(this, (Qtum.__proto__ || Object.getPrototypeOf(Qtum)).call(this, providerURL));
+
+        _this.repo = new ContractsRepo_1.ContractsRepo(_this, Object.assign({
             // massage the repoData by providing empty default properties
             contracts: {}, libraries: {}, related: {} }, repoData));
+        return _this;
     }
     /**
      * A factory method to instantiate a `Contract` instance using the ABI
@@ -438,346 +718,460 @@ class Qtum extends QtumRPC_1.QtumRPC {
      *
      * @param name The name of a deployed contract
      */
-    contract(name) {
-        return this.repo.contract(name);
-    }
-}
+
+
+    _createClass(Qtum, [{
+        key: "contract",
+        value: function contract(name) {
+            return this.repo.contract(name);
+        }
+    }]);
+
+    return Qtum;
+}(QtumRPC_1.QtumRPC);
+
 exports.Qtum = Qtum;
 
 },{"./ContractsRepo":2,"./QtumRPC":5}],5:[function(require,module,exports){
 "use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 Object.defineProperty(exports, "__esModule", { value: true });
-const QtumRPCRaw_1 = require("./QtumRPCRaw");
-const sendToContractRequestDefaults = {
+var QtumRPCRaw_1 = require("./QtumRPCRaw");
+var sendToContractRequestDefaults = {
     amount: 0,
     gasLimit: 200000,
     // FIXME: Does not support string gasPrice although the doc says it does.
-    gasPrice: 0.0000004,
+    gasPrice: 0.0000004
 };
-class QtumRPC extends QtumRPCRaw_1.QtumRPCRaw {
-    getInfo() {
-        return this.rawCall("getinfo");
+
+var QtumRPC = function (_QtumRPCRaw_1$QtumRPC) {
+    _inherits(QtumRPC, _QtumRPCRaw_1$QtumRPC);
+
+    function QtumRPC() {
+        _classCallCheck(this, QtumRPC);
+
+        return _possibleConstructorReturn(this, (QtumRPC.__proto__ || Object.getPrototypeOf(QtumRPC)).apply(this, arguments));
     }
-    createContract(req) {
-        const vals = Object.assign({}, sendToContractRequestDefaults, req);
-        const args = [
-            vals.bytecode,
-            vals.gasLimit,
-            vals.gasPrice
-        ];
-        if (vals.senderAddress) {
-            args.push(vals.senderAddress);
+
+    _createClass(QtumRPC, [{
+        key: "getInfo",
+        value: function getInfo() {
+            return this.rawCall("getinfo");
         }
-        return this.rawCall("createcontract", args);
-    }
-    sendToContract(req) {
-        const vals = Object.assign({}, sendToContractRequestDefaults, req);
-        const args = [
-            vals.address,
-            vals.datahex,
-            vals.amount,
-            vals.gasLimit,
-            vals.gasPrice,
-        ];
-        if (vals.senderAddress) {
-            args.push(vals.senderAddress);
+    }, {
+        key: "createContract",
+        value: function createContract(req) {
+            var vals = Object.assign({}, sendToContractRequestDefaults, req);
+            var args = [vals.bytecode, vals.gasLimit, vals.gasPrice];
+            if (vals.senderAddress) {
+                args.push(vals.senderAddress);
+            }
+            return this.rawCall("createcontract", args);
         }
-        return this.rawCall("sendtocontract", args);
-    }
-    callContract(req) {
-        const args = [
-            req.address,
-            req.datahex,
-        ];
-        if (req.senderAddress) {
-            args.push(req.senderAddress);
+    }, {
+        key: "sendToContract",
+        value: function sendToContract(req) {
+            var vals = Object.assign({}, sendToContractRequestDefaults, req);
+            var args = [vals.address, vals.datahex, vals.amount, vals.gasLimit, vals.gasPrice];
+            if (vals.senderAddress) {
+                args.push(vals.senderAddress);
+            }
+            return this.rawCall("sendtocontract", args);
         }
-        return this.rawCall("callcontract", args);
-    }
-    getTransaction(req) {
-        const args = [
-            req.txid,
-        ];
-        if (req.include_watchonly) {
-            args.push(req.include_watchonly);
+    }, {
+        key: "callContract",
+        value: function callContract(req) {
+            var args = [req.address, req.datahex];
+            if (req.senderAddress) {
+                args.push(req.senderAddress);
+            }
+            return this.rawCall("callcontract", args);
         }
-        else {
-            args.push(false);
+    }, {
+        key: "getTransaction",
+        value: function getTransaction(req) {
+            var args = [req.txid];
+            if (req.include_watchonly) {
+                args.push(req.include_watchonly);
+            } else {
+                args.push(false);
+            }
+            if (req.waitconf) {
+                args.push(req.waitconf);
+            }
+            return this.rawCall("gettransaction", args);
         }
-        if (req.waitconf) {
-            args.push(req.waitconf);
+    }, {
+        key: "getTransactionReceipt",
+        value: async function getTransactionReceipt(req) {
+            // The raw RPC API returns [] if tx id doesn't exist or not mined yet
+            // When transaction is mined, the API returns [receipt]
+            //
+            // We'll do the unwrapping here.
+            var result = await this.rawCall("gettransactionreceipt", [req.txid]);
+            if (result.length === 0) {
+                return null;
+            }
+            return result[0];
         }
-        return this.rawCall("gettransaction", args);
-    }
-    async getTransactionReceipt(req) {
-        // The raw RPC API returns [] if tx id doesn't exist or not mined yet
-        // When transaction is mined, the API returns [receipt]
-        //
-        // We'll do the unwrapping here.
-        const result = await this.rawCall("gettransactionreceipt", [req.txid]);
-        if (result.length === 0) {
-            return null;
+        /**
+         * Long-poll request to get logs. Cancel the returned promise to terminate polling early.
+         */
+
+    }, {
+        key: "waitforlogs",
+        value: function waitforlogs() {
+            var req = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            var args = [req.fromBlock, req.toBlock, req.filter, req.minconf];
+            var cancelTokenSource = this.cancelTokenSource();
+            var p = this.rawCall("waitforlogs", args, { cancelToken: cancelTokenSource.token });
+            return Object.assign(p, {
+                cancel: cancelTokenSource.cancel.bind(cancelTokenSource)
+            });
         }
-        return result[0];
-    }
-    /**
-     * Long-poll request to get logs. Cancel the returned promise to terminate polling early.
-     */
-    waitforlogs(req = {}) {
-        const args = [
-            req.fromBlock,
-            req.toBlock,
-            req.filter,
-            req.minconf,
-        ];
-        const cancelTokenSource = this.cancelTokenSource();
-        const p = this.rawCall("waitforlogs", args, { cancelToken: cancelTokenSource.token });
-        return Object.assign(p, {
-            cancel: cancelTokenSource.cancel.bind(cancelTokenSource),
-        });
-    }
-    async searchlogs(_req = {}) {
-        const searchlogsDefaults = {
-            fromBlock: "latest",
-            toBlock: -1,
-            addresses: [],
-            topics: [],
-            minconf: 0,
-        };
-        const req = Object.assign({ searchlogsDefaults }, _req);
-        const args = [
-            req.fromBlock,
-            req.toBlock,
-            req.addresses,
-            req.topics,
-            req.minconf,
-        ];
-        return this.rawCall("searchlogs", args);
-    }
-    async checkTransactionWaitSupport() {
-        if (this._hasTxWaitSupport !== undefined) {
+    }, {
+        key: "searchlogs",
+        value: async function searchlogs() {
+            var _req = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            var searchlogsDefaults = {
+                fromBlock: "latest",
+                toBlock: -1,
+                addresses: [],
+                topics: [],
+                minconf: 0
+            };
+            var req = Object.assign({ searchlogsDefaults: searchlogsDefaults }, _req);
+            var args = [req.fromBlock, req.toBlock, req.addresses, req.topics, req.minconf];
+            return this.rawCall("searchlogs", args);
+        }
+    }, {
+        key: "checkTransactionWaitSupport",
+        value: async function checkTransactionWaitSupport() {
+            if (this._hasTxWaitSupport !== undefined) {
+                return this._hasTxWaitSupport;
+            }
+            var helpmsg = await this.rawCall("help", ["gettransaction"]);
+            this._hasTxWaitSupport = helpmsg.split("\n")[0].indexOf("waitconf") !== -1;
             return this._hasTxWaitSupport;
         }
-        const helpmsg = await this.rawCall("help", ["gettransaction"]);
-        this._hasTxWaitSupport = helpmsg.split("\n")[0].indexOf("waitconf") !== -1;
-        return this._hasTxWaitSupport;
-    }
-}
+    }]);
+
+    return QtumRPC;
+}(QtumRPCRaw_1.QtumRPCRaw);
+
 exports.QtumRPC = QtumRPC;
 
 },{"./QtumRPCRaw":6}],6:[function(require,module,exports){
 "use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = require("axios");
-const URL = require("url-parse");
-class QtumRPCRaw {
-    constructor(_baseURL) {
+var axios_1 = require("axios");
+var URL = require("url-parse");
+
+var QtumRPCRaw = function () {
+    function QtumRPCRaw(_baseURL) {
+        _classCallCheck(this, QtumRPCRaw);
+
         this._baseURL = _baseURL;
         this.idNonce = 0;
-        const url = new URL(_baseURL);
-        const config = {
+        var url = new URL(_baseURL);
+        var config = {
             baseURL: url.origin,
             // don't throw on non-200 response
-            validateStatus: () => true,
+            validateStatus: function validateStatus() {
+                return true;
+            }
         };
         if (url.username !== "" && url.password !== "") {
             config.auth = {
                 username: url.username,
-                password: url.password,
+                password: url.password
             };
         }
         this._api = axios_1.default.create(config);
         this.idNonce = 0;
     }
-    cancelTokenSource() {
-        return axios_1.default.CancelToken.source();
-    }
-    async rawCall(method, params = [], opts = {}) {
-        const rpcCall = {
-            method,
-            params,
-            id: this.idNonce++,
-        };
-        let res = await this.makeRPCCall(rpcCall);
-        if (res.status === 402) {
-            const auth = res.data;
-            res = await this.authCall(auth.id, rpcCall);
+
+    _createClass(QtumRPCRaw, [{
+        key: "cancelTokenSource",
+        value: function cancelTokenSource() {
+            return axios_1.default.CancelToken.source();
         }
-        if (res.status === 401) {
-            // body is empty
-            throw new Error(await res.statusText);
-        }
-        // 404 if method doesn't exist
-        if (res.status === 404) {
-            throw new Error(`unknown method: ${method}`);
-        }
-        if (res.status !== 200) {
-            if (res.headers["content-type"] !== "application/json") {
-                const body = await res.data;
-                throw new Error(`${res.status} ${res.statusText}\n${res.data}`);
+    }, {
+        key: "rawCall",
+        value: async function rawCall(method) {
+            var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+            var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+            var rpcCall = {
+                method: method,
+                params: params,
+                id: this.idNonce++
+            };
+            var res = await this.makeRPCCall(rpcCall);
+            if (res.status === 402) {
+                var auth = res.data;
+                res = await this.authCall(auth.id, rpcCall);
             }
-            const eresult = await res.data;
-            if (eresult.error) {
-                const { code, message, } = eresult.error;
-                throw new Error(`[${code}] ${message}`);
+            if (res.status === 401) {
+                // body is empty
+                throw new Error((await res.statusText));
             }
-            else {
-                throw new Error(String(eresult));
+            // 404 if method doesn't exist
+            if (res.status === 404) {
+                throw new Error("unknown method: " + method);
+            }
+            if (res.status !== 200) {
+                if (res.headers["content-type"] !== "application/json") {
+                    var body = await res.data;
+                    throw new Error(res.status + " " + res.statusText + "\n" + res.data);
+                }
+                var eresult = await res.data;
+                if (eresult.error) {
+                    var _eresult$error = eresult.error,
+                        code = _eresult$error.code,
+                        message = _eresult$error.message;
+
+                    throw new Error("[" + code + "] " + message);
+                } else {
+                    throw new Error(String(eresult));
+                }
+            }
+
+            var _ref = await res.data,
+                result = _ref.result;
+
+            return result;
+        }
+    }, {
+        key: "makeRPCCall",
+        value: function makeRPCCall(rpcCall) {
+            return this._api.post("/", rpcCall);
+        }
+    }, {
+        key: "authCall",
+        value: async function authCall(authID, rpcCall) {
+            // long-poll an authorization until its state changes
+            var res = await this._api.get("/api/authorizations/" + authID + "/onchange");
+            var data = res.data;
+
+            if (res.status !== 200) {
+                throw new Error(data.message);
+            }
+            var auth = data;
+            if (auth.state === "denied") {
+                throw new Error("Authorization denied: " + authID);
+            }
+            if (auth.state === "accepted") {
+                return this.makeRPCCall(Object.assign({}, rpcCall, { auth: auth.id }));
             }
         }
-        const { result } = await res.data;
-        return result;
-    }
-    makeRPCCall(rpcCall) {
-        return this._api.post("/", rpcCall);
-    }
-    async authCall(authID, rpcCall) {
-        // long-poll an authorization until its state changes
-        const res = await this._api.get(`/api/authorizations/${authID}/onchange`);
-        const { data } = res;
-        if (res.status !== 200) {
-            throw new Error(data.message);
-        }
-        const auth = data;
-        if (auth.state === "denied") {
-            throw new Error(`Authorization denied: ${authID}`);
-        }
-        if (auth.state === "accepted") {
-            return this.makeRPCCall(Object.assign({}, rpcCall, { auth: auth.id }));
-        }
-    }
-}
+    }]);
+
+    return QtumRPCRaw;
+}();
+
 exports.QtumRPCRaw = QtumRPCRaw;
 
 },{"axios":11,"url-parse":47}],7:[function(require,module,exports){
 "use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 Object.defineProperty(exports, "__esModule", { value: true });
-const eventemitter3_1 = require("eventemitter3");
-const sleep_1 = require("./sleep");
-const EVENT_CONFIRM = "confirm";
-class TxReceiptPromise {
-    constructor(_rpc, txid) {
+var eventemitter3_1 = require("eventemitter3");
+var sleep_1 = require("./sleep");
+var EVENT_CONFIRM = "confirm";
+
+var TxReceiptPromise = function () {
+    function TxReceiptPromise(_rpc, txid) {
+        _classCallCheck(this, TxReceiptPromise);
+
         this._rpc = _rpc;
         this.txid = txid;
         this._emitter = new eventemitter3_1.EventEmitter();
     }
     // TODO should return parsed logs with the receipt
-    async confirm(confirm = 6, opts = {}) {
-        const minconf = confirm;
-        const pollInterval = opts.pollInterval || 3000;
-        const hasTxWaitSupport = await this._rpc.checkTransactionWaitSupport();
-        // if hasTxWaitSupport, make one long-poll per confirmation
-        let curConfirmation = 1;
-        // if !hasTxWaitSupport, poll every interval until tx.confirmations increased
-        let lastConfirmation = 0;
-        while (true) {
-            const req = { txid: this.txid };
-            if (hasTxWaitSupport) {
-                req.waitconf = curConfirmation;
-            }
-            const tx = await this._rpc.getTransaction(req);
-            if (tx.confirmations > 0) {
-                const receipt = await this._rpc.getTransactionReceipt({ txid: tx.txid });
-                if (!receipt) {
-                    throw new Error("Cannot get transaction receipt");
+
+
+    _createClass(TxReceiptPromise, [{
+        key: "confirm",
+        value: async function confirm() {
+            var _confirm = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 6;
+
+            var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var minconf = _confirm;
+            var pollInterval = opts.pollInterval || 3000;
+            var hasTxWaitSupport = await this._rpc.checkTransactionWaitSupport();
+            // if hasTxWaitSupport, make one long-poll per confirmation
+            var curConfirmation = 1;
+            // if !hasTxWaitSupport, poll every interval until tx.confirmations increased
+            var lastConfirmation = 0;
+            while (true) {
+                var req = { txid: this.txid };
+                if (hasTxWaitSupport) {
+                    req.waitconf = curConfirmation;
                 }
-                // TODO augment receipt2 with parsed logs
-                const receipt2 = receipt;
-                // const ctx = new ConfirmedTransaction(this.contract.info.abi, tx, receipt)
-                if (tx.confirmations > lastConfirmation) {
-                    // confirmation increased since last check
-                    curConfirmation = tx.confirmations;
-                    this._emitter.emit(EVENT_CONFIRM, tx, receipt2);
-                    // TODO emit update event
-                    // txUpdated(ctx)
+                var tx = await this._rpc.getTransaction(req);
+                if (tx.confirmations > 0) {
+                    var receipt = await this._rpc.getTransactionReceipt({ txid: tx.txid });
+                    if (!receipt) {
+                        throw new Error("Cannot get transaction receipt");
+                    }
+                    // TODO augment receipt2 with parsed logs
+                    var receipt2 = receipt;
+                    // const ctx = new ConfirmedTransaction(this.contract.info.abi, tx, receipt)
+                    if (tx.confirmations > lastConfirmation) {
+                        // confirmation increased since last check
+                        curConfirmation = tx.confirmations;
+                        this._emitter.emit(EVENT_CONFIRM, tx, receipt2);
+                        // TODO emit update event
+                        // txUpdated(ctx)
+                    }
+                    if (tx.confirmations >= minconf) {
+                        // reached number of required confirmations. done
+                        return receipt2;
+                    }
                 }
-                if (tx.confirmations >= minconf) {
-                    // reached number of required confirmations. done
-                    return receipt2;
+                lastConfirmation = tx.confirmations;
+                if (hasTxWaitSupport) {
+                    // long-poll for one additional confirmation
+                    curConfirmation++;
+                } else {
+                    await sleep_1.sleep(pollInterval + Math.random() * 200);
                 }
-            }
-            lastConfirmation = tx.confirmations;
-            if (hasTxWaitSupport) {
-                // long-poll for one additional confirmation
-                curConfirmation++;
-            }
-            else {
-                await sleep_1.sleep(pollInterval + Math.random() * 200);
             }
         }
-    }
-    onConfirm(fn) {
-        this._emitter.on(EVENT_CONFIRM, fn);
-    }
-    offConfirm(fn) {
-        this._emitter.off(EVENT_CONFIRM, fn);
-    }
-}
+    }, {
+        key: "onConfirm",
+        value: function onConfirm(fn) {
+            this._emitter.on(EVENT_CONFIRM, fn);
+        }
+    }, {
+        key: "offConfirm",
+        value: function offConfirm(fn) {
+            this._emitter.off(EVENT_CONFIRM, fn);
+        }
+    }]);
+
+    return TxReceiptPromise;
+}();
+
 exports.TxReceiptPromise = TxReceiptPromise;
 
 },{"./sleep":10,"eventemitter3":37}],8:[function(require,module,exports){
 "use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 Object.defineProperty(exports, "__esModule", { value: true });
-const { decodeParams, encodeParams, encodeMethod, logDecoder, configure: configureABI, } = require("qtumjs-ethjs-abi");
+
+var _require = require("qtumjs-ethjs-abi"),
+    decodeParams = _require.decodeParams,
+    encodeParams = _require.encodeParams,
+    encodeMethod = _require.encodeMethod,
+    logDecoder = _require.logDecoder,
+    configureABI = _require.configure;
+
 configureABI({ noHexStringPrefix: true });
-function encodeConstructorParams(contract, params = []) {
-    const types = contract.filter((method) => {
+function encodeConstructorParams(contract) {
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+    var types = contract.filter(function (method) {
         return method.type === "constructor" && method.inputs.length === params.length;
-    }).map((method) => {
-        return method.inputs.map((input) => {
+    }).map(function (method) {
+        return method.inputs.map(function (input) {
             return input.type;
         });
     })[0] || [];
-    const calldata = encodeParams(types, params);
+    var calldata = encodeParams(types, params);
     return calldata;
 }
 exports.encodeConstructorParams = encodeConstructorParams;
-function encodeInputs(method, args = []) {
-    const calldata = encodeMethod(method, args);
+function encodeInputs(method) {
+    var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+    var calldata = encodeMethod(method, args);
     return calldata;
 }
 exports.encodeInputs = encodeInputs;
 function decodeOutputs(method, outputData) {
-    const types = method.outputs.map((output) => output.type);
+    var types = method.outputs.map(function (output) {
+        return output.type;
+    });
     // FIXME: would be nice to explicitly request for Array result
-    const result = decodeParams(types, outputData);
+    var result = decodeParams(types, outputData);
     // Convert result to normal array...
-    const values = [];
-    for (let i = 0; i < types.length; i++) {
+    var values = [];
+    for (var i = 0; i < types.length; i++) {
         values[i] = result[i];
     }
     return values;
 }
 exports.decodeOutputs = decodeOutputs;
-class ContractLogDecoder {
-    constructor(abi) {
+
+var ContractLogDecoder = function () {
+    function ContractLogDecoder(abi) {
+        _classCallCheck(this, ContractLogDecoder);
+
         this.abi = abi;
         this._decoder = logDecoder(abi);
     }
-    decode(rawlog) {
-        const result = this._decoder([rawlog]);
-        if (result.length === 0) {
-            return null;
+
+    _createClass(ContractLogDecoder, [{
+        key: "decode",
+        value: function decode(rawlog) {
+            var result = this._decoder([rawlog]);
+            if (result.length === 0) {
+                return null;
+            }
+            var log = result[0];
+            return log;
         }
-        const log = result[0];
-        return log;
-    }
-}
+    }]);
+
+    return ContractLogDecoder;
+}();
+
 exports.ContractLogDecoder = ContractLogDecoder;
 
 },{"qtumjs-ethjs-abi":42}],9:[function(require,module,exports){
 (function (Buffer){
 "use strict";
+
 function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    for (var p in m) {
+        if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    }
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 // Browser polyfill required by ethjs-abi
 // https://github.com/ethjs/ethjs-abi/blob/5e2d4c3b7207111c143ca30d01d743c28cfb52f6/src/utils/index.js#L28
 if (typeof Buffer === "undefined") {
-    const { Buffer } = require("buffer");
+    var _require = require("buffer"),
+        _Buffer = _require.Buffer;
+
     Object.assign(window, {
-        Buffer,
+        Buffer: _Buffer
     });
 }
 __export(require("./abi"));
@@ -789,9 +1183,10 @@ __export(require("./TxReceiptPromise"));
 }).call(this,require("buffer").Buffer)
 },{"./Contract":1,"./Qtum":4,"./QtumRPC":5,"./TxReceiptPromise":7,"./abi":8,"buffer":49}],10:[function(require,module,exports){
 "use strict";
+
 Object.defineProperty(exports, "__esModule", { value: true });
 async function sleep(ms) {
-    return new Promise((resolve) => {
+    return new Promise(function (resolve) {
         setTimeout(resolve, ms);
     });
 }

@@ -88,6 +88,10 @@
   cursor: pointer;
 }
 
+.error-noerror {
+  background-color: rgba(183, 245, 102, 0.66);
+}
+
 .error-type-warning {
   background-color: rgba(240, 172, 78, 0.66);
 }
