@@ -19,7 +19,7 @@ const getTask = (target: string, destDir: string, sourceMaps: boolean = false) =
         : plugins.util.noop()
     )
     .pipe(
-      plugins.uglify({
+      plugins.uglifyEs.default({
         compress: true,
         mangle: true
       })

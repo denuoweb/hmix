@@ -14,7 +14,7 @@ import { qtumjs } from '../../globals';
 
 @Injectable()
 export class QtumService {
-  private _defaultRpcUrl = 'http://qtum:test@localhost:3889';
+  private _defaultRpcUrl = 'http://qtum:test@localhost:9888';
 
   constructor(private storageService: StorageService) { }
 
