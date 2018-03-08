@@ -3,10 +3,28 @@
   height: 100%;
   width: 100%;
   display: block;
+  overflow: hidden;
+}
+
+.terminal-input-container {
+  position: relative;
+  color: white;
+  border-top: 1px solid grey;
+}
+
+.terminal-input-container input {
+  margin: 0;
+  padding-left: 25px;
+}
+
+.terminal-arrow {
+  position: absolute;
+  left: 10px;
+  top: 12px;
 }
 
 .terminal-logs {
-  height: 100%;
+  height: calc(100% - 47px);
   width: 100%;
   display: block;
   overflow-y: overlay;

@@ -18,7 +18,7 @@ import { STORAGE_KEYS } from '../shared/constants/storage-keys';
 export class HomeComponent implements OnInit {
   private tabsWidth = 50;
   private defaultSidebarWidth = 200;
-  private defaultTerminalHeight = 0;
+  private defaultTerminalHeight = 250;
   private minSidebarWidth = 150;
   private minTerminalHeight = 100;
   private _terminalHeight: number;

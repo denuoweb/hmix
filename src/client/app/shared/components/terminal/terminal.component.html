@@ -1,3 +1,7 @@
 <div class="terminal-logs" #logContainer>
   <pre *ngFor="let log of logs" class="terminal-log">{{ log }}</pre>
 </div>
+<div class="terminal-input-container">
+  <span class="terminal-arrow">></span>
+  <input name="terminal-input" type="text" (keydown.enter)="handleCommand()" [(ngModel)]="terminalCommand">
+</div>

@@ -9,6 +9,10 @@ export class TerminalService {
     this.onTerminalOpenRequest.emit();
   }
 
+  clear(): void {
+    this._logs = [];
+  }
+
   log(status: string): void {
     this.openTerminal();
     this._logs.push(status);
