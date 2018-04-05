@@ -1,10 +1,10 @@
 {
-  "name": "angular-seed",
-  "version": "1.0.0",
-  "description": "Modular starter project for Angular 2 (and beyond) with statically typed build and AoT compilation",
+  "name": "qmix",
+  "version": "0.0.1",
+  "description": "An in-browser Solidity IDE for Qtum",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mgechev/angular-seed"
+    "url": "https://github.com/kfichter/qmix-revamp"
   },
   "scripts": {
     "build.tools": "tsc && gulp build.tools --color",
@@ -44,7 +44,7 @@
     "compodoc": "./node_modules/.bin/compodoc -p src/client/tsconfig.json",
     "serve.compodoc": "./node_modules/.bin/compodoc -s"
   },
-  "author": "Minko Gechev <mgechev>",
+  "author": "Kelvin Fichter <kfichter>",
   "license": "MIT",
   "engines": {
     "node": ">=6.9.0",

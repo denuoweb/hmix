@@ -7,6 +7,9 @@ import { File } from '../../../models/file.model';
 import { CompilerService } from '../../../services/compiler/compiler.service';
 import { FileService } from '../../../services/file/file.service';
 
+// Constants
+import { VERSION } from '../../../constants/version';
+
 @Component({
   moduleId: module.id,
   selector: 'sd-file-tab',
@@ -17,6 +20,7 @@ export class FileTabComponent implements AfterViewInit {
   isCreatingNewFile = false;
   isRenamingFile = false;
   fileToBeRenamed: File;
+  version = VERSION;
 
   constructor(private fileService: FileService,
               private compilerService: CompilerService) { }

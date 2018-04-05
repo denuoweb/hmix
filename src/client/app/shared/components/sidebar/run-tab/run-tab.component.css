@@ -4,26 +4,33 @@
 
 .rpc-url-input {
   padding: 10px;
+  height: 300px;
+  width: 470px;
 }
 
-.rpc-url-input {
-  height: 100px;
+.rpc-url-input input {
+  margin-bottom: 5px;
 }
 
 .deployment-options {
-  height: 120px;
+  height: 162px;
 }
 
 .contracts {
-  height: calc(100% - 262px);
+  height: calc(100% - 462px);
   overflow-y: overlay;
   overflow-x: hidden;
   display: block;
 }
 
-.rpc-url-input .input-field {
-  width: 250px;
+.rpc-url-input .input-field,
+.rpc-url-input mat-form-field {
+  width: 100%;
   color: white;
+}
+
+.rpc-url-input mat-form-field {
+  top: 9px;
 }
 
 .deployment-options {
@@ -33,7 +40,8 @@
 }
 
 .contract-form {
-  width: 250px;
+  width: 450px;
+  display: block;
   position: relative;
   top: 9px;
 }

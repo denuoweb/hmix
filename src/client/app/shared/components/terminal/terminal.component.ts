@@ -15,6 +15,8 @@ export class TerminalComponent implements AfterViewInit {
   @ViewChild('logContainer') private logContainer: ElementRef;
   private terminalOpenSub: Subscription;
   private terminalCommand: string;
+  private commandHistory: string[] = [''];
+  private historyIndex = 0;
 
   constructor(private terminalService: TerminalService,
               private qtumService: QtumService) { }
@@ -27,10 +29,28 @@ export class TerminalComponent implements AfterViewInit {
     });
   }
 
-  handleCommand() {
+  loadFromHistory(direction: number): void {
+    this.commandHistory[this.historyIndex] = this.terminalCommand;
+    this.historyIndex += direction;
+
+    if (this.historyIndex < 0) {
+      this.historyIndex = 0;
+    } else {
+      if (this.historyIndex >= this.commandHistory.length) {
+        this.historyIndex = this.commandHistory.length - 1;
+      }
+    }
+
+    this.terminalCommand = this.commandHistory[this.historyIndex];
+  }
+
+  handleCommand(): void {
     if (this.terminalCommand.trim() === '') {
       return;
     }
+
+    this.commandHistory.splice(1, 0, this.terminalCommand);
+    this.historyIndex = 0;
 
     const splitCommand = this.terminalCommand.split(' ');
     const command = splitCommand[0];
@@ -53,10 +73,11 @@ export class TerminalComponent implements AfterViewInit {
         this.terminalService.log(err);
       });
     }
+
     this.terminalCommand = '';
   }
 
-  private scrollToBottom() {
+  private scrollToBottom(): void {
     this.logContainer.nativeElement.scrollTop = this.logContainer.nativeElement.scrollHeight;
   }
 

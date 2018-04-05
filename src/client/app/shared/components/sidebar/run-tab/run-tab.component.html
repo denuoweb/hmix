@@ -1,7 +1,23 @@
 <div class="rpc-url-input">
   <div class="input-field">
-    <input id="qtum-rpc-url" name="qtum-rpc-url" type="text" [(ngModel)]="rpcUrl">
+    <input id="qtum-rpc-url" name="qtum-rpc-url" type="text" [(ngModel)]="rpcUrl" (change)="getUnspent()">
     <label for="qtum-rpc-url" class="active">Qtum RPC URL</label>
+  </div>
+
+  <mat-form-field>
+    <mat-select [(value)]="selectedUtxo" placeholder="Account">
+      <mat-option *ngFor="let utxo of unspent" [value]="utxo">{{ utxo.address }} ({{ utxo.amount }})</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="input-field">
+    <input id="gas-limit" name="gas-limit" type="text" [(ngModel)]="gasLimit">
+    <label for="gas-limit" class="active">Gas Limit</label>
+  </div>
+
+  <div class="input-field">
+    <input id="tx-value" name="tx-value" type="text" [(ngModel)]="txValue">
+    <label for="tx-value" class="active">Transaction Value</label>
   </div>
 </div>
 
@@ -31,7 +47,7 @@
     <div class="contract" *ngIf="contract.expanded">
       <div *ngFor="let fn of contract.functions" class="contract-fn">
         <a class="waves-effect waves-light btn call-button" (click)="callOrSend(contract, fn)">{{ fn.name }}</a>
-        <div class="input-field fn-inputs" *ngIf="fn.inputs.length > 0">
+        <div class="input-field fn-inputs" *ngIf="fn.inputs && fn.inputs.length > 0">
           <input name="function-inputs" type="text" [placeholder]="getFunctionInputs(fn)" [(ngModel)]="fn.args">
           <label for="function-inputs" class="active">Function Arguments</label>
         </div>

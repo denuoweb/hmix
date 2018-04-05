@@ -8,13 +8,7 @@ import { Component } from '@angular/core';
 })
 export class HelpTabComponent {
   private helpCommands = {
-    'docker': '$ docker run -it --rm \\ \n' +
-              '    --name myapp \\ \n' +
-              '    -v \`pwd\`:/dapp \\ \n' +
-              '    -p 9899:9899 \\ \n' +
-              '    -p 9888:9888 \\ \n' +
-              '    -p 3889:3889 \\ \n' +
-              '    hayeah/qtumportal',
+    'docker': '$ docker run -it --rm --name myapp -v `pwd`:/dapp -p 9899:9899 -p 9888:9888 -p 3889:3889 kfichter/qtum-portal-dev',
     'generateInitial': '$ docker exec -it myapp sh \n' +
                        '$ qcli generate 600',
     'generateOne': '$ qcli generate 1'

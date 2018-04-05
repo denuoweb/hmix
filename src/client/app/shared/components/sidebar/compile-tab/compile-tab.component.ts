@@ -79,6 +79,12 @@ export class CompileTabComponent implements OnInit {
       this._loadingCompiler = false;
       this.compile();
 
+      // This is a hack that forces the first compilation to work
+      // TODO: Fix this
+      setTimeout(() => {
+        this.compile();
+      }, 100);
+
       // Unsubscribe to make sure we don't create multiple subscriptions
       if (this.fileSavedSubscription) {
         this.fileSavedSubscription.unsubscribe();
