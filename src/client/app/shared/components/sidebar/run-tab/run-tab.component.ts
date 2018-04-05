@@ -77,6 +77,7 @@ export class RunTabComponent implements OnInit {
 
     this.terminalService.log(`Deploying: ${contract.name} (waiting for approval)`);
     contract.deploy(args, {
+      senderAddress: this.selectedUtxo.address,
       bytecode: this.selectedContract.evm.bytecode.object
     }).then((result: any) => {
       this.terminalService.log(`Deployed ${contract.name} @${contract.address}`);
