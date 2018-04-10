@@ -2,12 +2,14 @@ import { Component, OnInit, OnDestroy, HostListener, ChangeDetectorRef } from '@
 import { Subscription } from 'rxjs/Subscription';
 
 // Services
-import { TabService } from '../shared/services/tab/tab.service';
-import { StorageService } from '../shared/services/storage/storage.service';
-import { TerminalService } from '../shared/services/terminal/terminal.service';
+import { TabService, StorageService, TerminalService } from '../shared/services/index';
 
 // Constants
-import { STORAGE_KEYS } from '../shared/constants/storage-keys';
+import {
+  STORAGE_KEYS, TABS_WIDTH, DEFAULT_SIDEBAR_WIDTH,
+  MIN_SIDEBAR_WIDTH, DEFAULT_TERMINAL_HEIGHT,
+  MIN_TERMINAL_HEIGHT
+} from '../shared/constants/index';
 
 @Component({
   moduleId: module.id,
@@ -16,11 +18,6 @@ import { STORAGE_KEYS } from '../shared/constants/storage-keys';
   styleUrls: ['home.component.css'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  private _tabsWith = 50;
-  private _defaultSidebarWidth = 200;
-  private _defaultTerminalHeight = 250;
-  private _minSidebarWidth = 150;
-  private _minTerminalHeight = 100;
   private _terminalHeight: number;
   private _sidebarWidth: number;
   private _resizingSidebar: boolean;
@@ -41,20 +38,20 @@ export class HomeComponent implements OnInit, OnDestroy {
    */
 
   ngOnInit() {
-    this.sidebarWidth = this.storageService.get(STORAGE_KEYS['sidebarWidth']) || this._defaultSidebarWidth;
-    this.terminalHeight = this.storageService.get(STORAGE_KEYS['terminalHeight']) || this._defaultTerminalHeight;
+    this.sidebarWidth = this.storageService.get(STORAGE_KEYS['sidebarWidth']) || DEFAULT_SIDEBAR_WIDTH;
+    this.terminalHeight = this.storageService.get(STORAGE_KEYS['terminalHeight']) || DEFAULT_TERMINAL_HEIGHT;
 
     // Reset the sidebar width when the active tab changes
     this._tabChangeSub = this.tabService.onActiveTabChange.subscribe(() => {
-      if (this.sidebarWidth < this._minSidebarWidth) {
-        this.sidebarWidth = this._defaultSidebarWidth;
+      if (this.sidebarWidth < MIN_SIDEBAR_WIDTH) {
+        this.sidebarWidth = DEFAULT_SIDEBAR_WIDTH;
       }
     });
 
     // Reset the terminal width when requested to open
     this._terminalOpenSub = this.terminalService.onTerminalOpenRequest.subscribe(() => {
-      if (this.terminalHeight < this._minTerminalHeight) {
-        this.terminalHeight = this._minTerminalHeight;
+      if (this.terminalHeight < MIN_TERMINAL_HEIGHT) {
+        this.terminalHeight = MIN_TERMINAL_HEIGHT;
       }
     });
   }
@@ -77,9 +74,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       const currentX = event.clientX;
 
       // Calculate a new width
-      if (currentX > this._minSidebarWidth) {
+      if (currentX > MIN_SIDEBAR_WIDTH) {
         const newWidth = this.sidebarWidth + currentX - this._lastX;
-        this.sidebarWidth = Math.min(Math.max(newWidth, this._minSidebarWidth), this.maxSidebarWidth);
+        this.sidebarWidth = Math.min(Math.max(newWidth, MIN_SIDEBAR_WIDTH), this.maxSidebarWidth);
       } else {
         this.sidebarWidth = 0;
       }
@@ -89,9 +86,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       const currentY = event.clientY;
 
       // Calculate a new height
-      if (currentY < this.windowHeight - this._minTerminalHeight) {
+      if (currentY < this.windowHeight - MIN_TERMINAL_HEIGHT) {
         const newHeight = this.terminalHeight - currentY + this._lastY;
-        this.terminalHeight = Math.min(Math.max(newHeight, this._minTerminalHeight), this.maxTerminalHeight);
+        this.terminalHeight = Math.min(Math.max(newHeight, MIN_TERMINAL_HEIGHT), this.maxTerminalHeight);
       } else {
         this.terminalHeight = 0;
       }
@@ -156,7 +153,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get editorWidth(): number {
-    return this.windowWidth - this.sidebarWidth - this._tabsWith;
+    return this.windowWidth - this.sidebarWidth - TABS_WIDTH;
   }
 
   get editorHeight(): number {
@@ -164,7 +161,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get tabsWidth(): number {
-    return this._tabsWith;
+    return TABS_WIDTH;
   }
 
 
@@ -173,11 +170,11 @@ export class HomeComponent implements OnInit, OnDestroy {
    */
 
   private get maxSidebarWidth(): number {
-    return this.windowWidth - this._minSidebarWidth;
+    return this.windowWidth - MIN_SIDEBAR_WIDTH;
   }
 
   private get maxTerminalHeight(): number {
-    return this.windowHeight - this._minTerminalHeight;
+    return this.windowHeight - MIN_TERMINAL_HEIGHT;
   }
 
   private get windowHeight(): number {
