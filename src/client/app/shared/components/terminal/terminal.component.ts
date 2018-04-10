@@ -1,9 +1,8 @@
-import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
 // Services
-import { TerminalService } from '../../services/terminal/terminal.service';
-import { QtumService } from '../../services/qtum/qtum.service';
+import { TerminalService, QtumService } from '../../services/index';
 
 @Component({
   moduleId: module.id,
@@ -11,62 +10,87 @@ import { QtumService } from '../../services/qtum/qtum.service';
   templateUrl: 'terminal.component.html',
   styleUrls: ['terminal.component.css']
 })
-export class TerminalComponent implements AfterViewInit {
+export class TerminalComponent implements AfterViewInit, OnDestroy {
   @ViewChild('logContainer') private logContainer: ElementRef;
-  private terminalOpenSub: Subscription;
-  private terminalCommand: string;
-  private commandHistory: string[] = [''];
-  private historyIndex = 0;
+  private _terminalOpenSub: Subscription;
+  private _terminalCommand: string;
+  private _commandHistory: string[] = [''];
+  private _historyIndex = 0;
 
   constructor(private terminalService: TerminalService,
               private qtumService: QtumService) { }
 
+
+  /*
+   * Lifecycle hooks
+   */
+
   ngAfterViewInit() {
-    this.terminalOpenSub = this.terminalService.onTerminalOpenRequest.subscribe(() => {
+    // Scroll to the bottom whenever the terminal is updated
+    this._terminalOpenSub = this.terminalService.onTerminalOpenRequest.subscribe(() => {
       setTimeout(() => {
         this.scrollToBottom();
       }, 25);
     });
   }
 
-  loadFromHistory(direction: number): void {
-    this.commandHistory[this.historyIndex] = this.terminalCommand;
-    this.historyIndex += direction;
-
-    if (this.historyIndex < 0) {
-      this.historyIndex = 0;
-    } else {
-      if (this.historyIndex >= this.commandHistory.length) {
-        this.historyIndex = this.commandHistory.length - 1;
-      }
-    }
-
-    this.terminalCommand = this.commandHistory[this.historyIndex];
+  ngOnDestroy() {
+    // Stop all subscriptions to avoid memory leaks
+    this._terminalOpenSub.unsubscribe();
   }
 
+
+  /*
+   * Public functions
+   */
+
+  /**
+   * Loads a command from either up or down in the history
+   * @param {number} direction
+   */
+  loadCommandFromHistory(direction: number): void {
+    // Store the current command at the current index
+    this._commandHistory[this._historyIndex] = this._terminalCommand;
+
+    // Move the index in the given direction
+    this._historyIndex += direction;
+
+    if (this._historyIndex < 0) {
+      this._historyIndex = 0;
+    } else if (this._historyIndex >= this._commandHistory.length) {
+      this._historyIndex = this._commandHistory.length - 1;
+    }
+
+    // Load the stored command
+    this._terminalCommand = this._commandHistory[this._historyIndex];
+  }
+
+  /**
+   * Executes the current terminal command
+   */
   handleCommand(): void {
-    if (this.terminalCommand.trim() === '') {
+    // Don't do anything if the command is an empty string
+    if (this._terminalCommand.trim() === '') {
       return;
     }
 
-    this.commandHistory.splice(1, 0, this.terminalCommand);
-    this.historyIndex = 0;
+    // Insert the current command into the history and reset the index
+    this._commandHistory.splice(1, 0, this._terminalCommand);
+    this._historyIndex = 0;
 
-    const splitCommand = this.terminalCommand.split(' ');
+    // Split the terminal input into the actual command and its arguments
+    const splitCommand = this._terminalCommand.split(' ');
     const command = splitCommand[0];
 
-    let args: string[] = [];
-    if (splitCommand.length > 1) {
-      args = splitCommand.slice(1);
-    }
+    // Slice off the arguments
+    let args: string[] = splitCommand.length > 1 ? splitCommand.slice(1) : [];
 
     if (command === 'clear') {
       this.terminalService.clear();
     } else {
       this.qtumService.rpc.rawCall(command, args).then((result: any) => {
-        if (result instanceof Object) {
-          result = JSON.stringify(result, null, '\t');
-        }
+        // Stringify the result
+        result = result instanceof Object ? JSON.stringify(result, null, '\t') : result;
         this.terminalService.log(result);
       }).catch((err: any) => {
         console.log(err);
@@ -74,14 +98,32 @@ export class TerminalComponent implements AfterViewInit {
       });
     }
 
-    this.terminalCommand = '';
+    this._terminalCommand = '';
   }
+
+
+  /*
+   * Private functions
+   */
 
   private scrollToBottom(): void {
     this.logContainer.nativeElement.scrollTop = this.logContainer.nativeElement.scrollHeight;
   }
 
+
+  /*
+   * Public getters/setters
+   */
+
   get logs(): string[] {
     return this.terminalService.logs;
+  }
+
+  get terminalCommand(): string {
+    return this._terminalCommand;
+  }
+
+  set terminalCommand(command: string) {
+    this._terminalCommand = command;
   }
 }
