@@ -83,7 +83,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     const command = splitCommand[0];
 
     // Slice off the arguments
-    let args: string[] = splitCommand.length > 1 ? splitCommand.slice(1) : [];
+    const args: string[] = splitCommand.length > 1 ? splitCommand.slice(1) : [];
 
     if (command === 'clear') {
       this.terminalService.clear();
