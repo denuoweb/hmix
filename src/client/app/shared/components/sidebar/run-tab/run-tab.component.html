@@ -34,7 +34,7 @@
   </mat-form-field>
 
   <div class="input-field constructor-input-field" *ngIf="constructorInputs.length > 0">
-    <input id="constructor-inputs" name="constructor-inputs" type="text" [placeholder]="constructorInputs" [(ngModel)]="constructorArgs">
+    <input id="constructor-inputs" name="constructor-inputs" type="text" [placeholder]="constructorInputs" [(ngModel)]="selectedContract.constructorArgs">
     <label for="constructor-inputs" class="active">Constructor Arguments</label>
   </div>
 

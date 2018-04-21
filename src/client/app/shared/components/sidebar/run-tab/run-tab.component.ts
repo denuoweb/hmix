@@ -17,7 +17,6 @@ import { qtumjs } from '../../../globals';
   styleUrls: ['run-tab.component.css']
 })
 export class RunTabComponent implements OnInit, OnDestroy {
-  private _constructorArgs: string;
   private _selectedContract: ICompilerContract;
   private _compilationStartedSub: Subscription;
   private _compilationFinishedSub: Subscription;
@@ -101,7 +100,8 @@ export class RunTabComponent implements OnInit, OnDestroy {
       return Object.assign({}, method);
     }).reverse();
 
-    const args = this.constructorArgs ? this.constructorArgs.split(',') : [];
+    const constructorArgs = (<any>this._selectedContract).constructorArgs;
+    const args = constructorArgs ? constructorArgs.split(',') : [];
 
     this.terminalService.log(`Deploying: ${contract.name}`);
     contract.deploy(args, {
