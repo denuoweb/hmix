@@ -3,5 +3,9 @@
 </div>
 <div class="terminal-input-container">
   <span class="terminal-arrow">></span>
-  <input name="terminal-input" type="text" (keydown.enter)="handleCommand()" (keydown.arrowup)="loadFromHistory(1)" (keydown.arrowdown)="loadFromHistory(-1)" [(ngModel)]="terminalCommand">
+  <input name="terminal-input" type="text"
+    (keydown.enter)="handleCommand()"
+    (keydown.arrowup)="loadCommandFromHistory(1)"
+    (keydown.arrowdown)="loadCommandFromHistory(-1)"
+    [(ngModel)]="terminalCommand">
 </div>

@@ -1,12 +1,10 @@
 import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 
 // Services
-import { CompilerService } from '../../services/compiler/compiler.service';
-import { EditorService } from '../../services/editor/editor.service';
-import { FileService } from '../../services/file/file.service';
+import { CompilerService, EditorService, FileService } from '../../services/index';
 
 // Models
-import { File } from '../../models/file.model';
+import { File } from '../../models/index';
 
 // Ace editor imports
 import * as ace from 'brace';
@@ -21,13 +19,17 @@ import './styling/solidity.mode';
   styleUrls: ['editor.component.css']
 })
 export class EditorComponent implements AfterViewInit {
-  private container = 'ace-container';
-  private editor: any;
+  private _editor: any;
 
   constructor(private fileService: FileService,
               private editorService: EditorService,
               private changeDetector: ChangeDetectorRef,
               private compilerService: CompilerService) { }
+
+
+  /*
+   * Lifecycle hooks
+   */
 
   ngAfterViewInit(): void {
     this.initEditor();
@@ -35,42 +37,80 @@ export class EditorComponent implements AfterViewInit {
     this.initSaveCheck();
   }
 
+
+  /*
+   * Public functions
+   */
+
+  /**
+   * Selects a file and requests its compilation
+   * @param {File} file
+   */
   selectFile(file: File): void {
     this.fileService.selectFile(file);
     this.compilerService.requestCompilation();
   }
 
+  /**
+   * Closes a file
+   * @param {File} file
+   */
   closeFile(file: File): void {
     this.fileService.closeFile(file);
   }
 
+  /**
+   * Closes all open files
+   */
   closeAll(): void {
     this.openFiles.forEach((file) => {
       this.closeFile(file);
     });
   }
 
+  /**
+   * Checks if a file is selected
+   * @param {File} file
+   * @return {boolean} Returns true if the file is selected, false otherwise;
+   */
   isSelected(file: File): boolean {
     return file === this.selectedFile;
   }
 
+
+  /*
+   * Private functions
+   */
+
+  /**
+   * Initializes the ace editor
+   */
   private initEditor(): void {
-    this.editor = ace.edit(this.container);
-    this.editor.getSession().setMode('ace/mode/javascript');
-    this.editor.setTheme('ace/theme/qmix');
-    this.editor.getSession().on('change', () => {
+    // Attach the editor to the DOM
+    this._editor = ace.edit('ace-container');
+
+    // Technically we're using a custom javascript mode (styling/solidity.mode.ts)
+    this._editor.getSession().setMode('ace/mode/javascript');
+    this._editor.setTheme('ace/theme/qmix');
+
+    // Let the file service know whenever we've changed the current file
+    this._editor.getSession().on('change', () => {
       this.fileService.onSelectedFileContentChanged();
     });
 
-    this.editorService.editor = this.editor;
+    this.editorService.editor = this._editor;
 
     this.fileService.loadSelectedFile();
     this.changeDetector.detectChanges();
   }
 
+  /**
+   * Initializes ace shortcuts
+   */
   private initShortcuts(): void {
-    const commands = this.editor.commands;
+    const commands = this._editor.commands;
 
+    // Ctrl+S/CMD+S triggers save
     commands.addCommand({
       name: 'save',
       bindKey: {
@@ -83,6 +123,10 @@ export class EditorComponent implements AfterViewInit {
     });
   }
 
+  /**
+   * Ensures that a warning appears if the user has unsaved
+   * files and attempts to close the browser window
+   */
   private initSaveCheck(): void {
     // Listen to an unload (window close) event
     window.addEventListener('beforeunload', (event: Event) => {
@@ -92,6 +136,11 @@ export class EditorComponent implements AfterViewInit {
       }
     });
   }
+
+
+  /*
+   * Public getters/setters
+   */
 
   get openFiles(): File[] {
     return this.fileService.openFiles;

@@ -1,13 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
 // Models
-import { ICompilerContract } from '../../../models/compiler-result.model';
+import { ICompilerContract } from '../../../models/index';
 
 // Services
-import { CompilerService } from '../../../services/compiler/compiler.service';
-import { QtumService } from '../../../services/qtum/qtum.service';
-import { TerminalService } from '../../../services/terminal/terminal.service';
+import { CompilerService, QtumService, TerminalService } from '../../../services/index';
 
 // External imports
 import { qtumjs } from '../../../globals';
@@ -18,51 +16,81 @@ import { qtumjs } from '../../../globals';
   templateUrl: 'run-tab.component.html',
   styleUrls: ['run-tab.component.css']
 })
-export class RunTabComponent implements OnInit {
+export class RunTabComponent implements OnInit, OnDestroy {
   private _constructorArgs: string;
-  private selectedContract: ICompilerContract;
-  private compilationStartedSub: Subscription;
-  private compilationFinishedSub: Subscription;
+  private _selectedContract: ICompilerContract;
+  private _compilationStartedSub: Subscription;
+  private _compilationFinishedSub: Subscription;
   private _loadedContracts: any[] = [];
-  private _compiling = true;
+  private _compiling: boolean;
+  private _loadingUtxos: boolean;
   private _lastError: string;
-  private unspent: any[] = [];
-  private selectedUtxo: any;
-  private gasLimit = 400000;
-  private txValue = 0;
+  private _utxos: any[] = [];
+  private _selectedUtxo: any;
+  private _gasLimit = 400000;
+  private _txValue = 0;
 
   constructor(private compilerService: CompilerService,
               private qtumService: QtumService,
               private terminalService: TerminalService) { }
 
+
+  /*
+   * Lifecycle hooks
+   */
+
   ngOnInit() {
-    this.getUnspent();
-    this.compilationStartedSub = this.compilerService.onCompilationStarted.subscribe(() => {
+    this.getUtxos();
+
+    this._compiling = true;
+    this._compilationStartedSub = this.compilerService.onCompilationStarted.subscribe(() => {
       this._compiling = true;
     });
-    this.compilationFinishedSub = this.compilerService.onCompilationFinished.subscribe(() => {
-      this.selectedContract = this.contracts[0];
+    this._compilationFinishedSub = this.compilerService.onCompilationFinished.subscribe(() => {
+      this._selectedContract = this.contracts[0];
       this._compiling = false;
     });
   }
 
-  getUnspent(): void {
+  ngOnDestroy() {
+    // Stop all subscriptions to avoid memory leaks
+    this._compilationStartedSub.unsubscribe();
+    this._compilationFinishedSub.unsubscribe();
+  }
+
+
+  /*
+   * Public functions
+   */
+
+  /**
+   * Load unspent transaction outputs
+   */
+  getUtxos(): void {
+    this._loadingUtxos = true;
     this.rpc.rawCall('listunspent').then((result: any) => {
-      this.unspent = result.sort((a: any, b: any) => {
+      // Return the 10 largest UTXOs by amount
+      this._utxos = result.sort((a: any, b: any) => {
         return b.amount - a.amount;
       }).slice(0, 10);
-      this.selectedUtxo = this.unspent[0];
+
+      // Select the largest UTXO automatically
+      this._selectedUtxo = this._utxos[0];
+      this._loadingUtxos = false;
     });
   }
 
+  /**
+   * Deploys the selected contract
+   */
   deploy(): void {
-    const contractInfo = {
-      abi: this.selectedContract.abi
-    };
-    const contract = new qtumjs.Contract(this.rpc, contractInfo);
+    // Create a qtumjs Contract object
+    const contract = new qtumjs.Contract(this.rpc, {
+      abi: this._selectedContract.abi
+    });
 
     // Make sure the Qtum.js Contract object has a name
-    contract.name = this.selectedContract.name;
+    contract.name = this._selectedContract.name;
     contract.expanded = true;
     contract.functions = contract.info.abi.filter((method: any) => {
       // Only show functions or the fallback
@@ -75,32 +103,38 @@ export class RunTabComponent implements OnInit {
 
     const args = this.constructorArgs ? this.constructorArgs.split(',') : [];
 
-    this.terminalService.log(`Deploying: ${contract.name} (waiting for approval)`);
+    this.terminalService.log(`Deploying: ${contract.name}`);
     contract.deploy(args, {
-      senderAddress: this.selectedUtxo.address,
-      bytecode: this.selectedContract.evm.bytecode.object
+      senderAddress: this._selectedUtxo.address,
+      bytecode: this._selectedContract.evm.bytecode.object
     }).then((result: any) => {
       this.terminalService.log(`Deployed ${contract.name} @${contract.address}`);
-      console.log(contract);
       this._loadedContracts.push(contract);
+
+      // Generate a new block so the contract is mined
       this.generateBlocks(1);
     }).catch((err: any) => {
-      console.log(err);
       this.terminalService.log(err);
     });
   }
 
+  /**
+   * Calls or sends to the selected function with the given arguments
+   * @param {any} contract The contract instance to transact to
+   * @param {any} fn The function to call
+   */
   callOrSend(contract: any, fn: any): void {
     const args = fn.args ? fn.args.split(',') : [];
 
+    // Determine the transaction type (call or send)
     let transactionType;
     if (fn.constant) {
-      this.terminalService.log(`Calling method: ${fn.name}`);
       transactionType = contract.call;
     } else {
-      this.terminalService.log(`Calling method: ${fn.name} (waiting for approval)`);
       transactionType = contract.send;
     }
+
+    this.terminalService.log(`Calling method: ${fn.name}`);
 
     const logEvents = (tx: any) => {
       tx.logs.forEach((log: any) => {
@@ -113,22 +147,26 @@ export class RunTabComponent implements OnInit {
     };
 
     if (fn.name === '(fallback)') {
+      // We're calling the fallback function
       this.rpc.rawCall('sendtocontract', [
-          contract.address,
-          '00000000',
-          this.txValue,
-          this.gasLimit,
-          0.0000004,
-          this.selectedUtxo.address
-        ]).then((tx: any) => {
+        contract.address,
+        '00000000',
+        this._txValue,
+        this._gasLimit,
+        0.0000004,
+        this._selectedUtxo.address
+      ]).then((tx: any) => {
         this.terminalService.log(`TXID: ${tx.txid}`);
+
+        // Generate a block so this transaction is mined
         this.generateBlocks(1);
       });
     } else {
+      // Normall call or send
       transactionType.call(contract, fn.name, args, {
-        senderAddress: this.selectedUtxo.address,
-        amount: this.txValue,
-        gasLimit: this.gasLimit
+        senderAddress: this._selectedUtxo.address,
+        amount: this._txValue,
+        gasLimit: this._gasLimit
       }).then((tx: any) => {
         if (fn.constant) {
           this.terminalService.log(`Outputs: ${tx.outputs}`);
@@ -139,6 +177,8 @@ export class RunTabComponent implements OnInit {
             logEvents(receipt);
           });
         }
+
+        // Generate a block so this transaction is mined
         this.generateBlocks(1);
       }).catch((err: any) => {
         console.log(err);
@@ -147,30 +187,52 @@ export class RunTabComponent implements OnInit {
     }
   }
 
+  /**
+   * Generates some number of blocks
+   * @param {number} numBlocks Number of blocks to generate
+   */
   generateBlocks(numBlocks: number): void {
     this.rpc.rawCall('generate', [numBlocks]).then((result: any) => {
       console.log(result);
     });
   }
 
-  getFunctionInputs(fn: any): string {
+  /**
+   * Returns the types for each of a function's arguments
+   * @param {any} fn Function to return types for
+   * @return {string[]} A string array of input types
+   */
+  getFunctionInputs(fn: any): string[] {
     return fn.inputs.map((input: any) => {
       return input.type;
     });
   }
 
+  /**
+   * Removes the selected contract from the list of contracts
+   * @param {any} contract Contract to remove
+   */
   removeContract(contract: any): void {
     this._loadedContracts = this._loadedContracts.filter((_contract) => {
       return _contract !== contract;
     });
   }
 
+  /**
+   * Toggles whether a contract is expanded
+   * @param contract Contract to toggle
+   */
   toggleExpand(contract: any): void {
     contract.expanded = !contract.expanded;
   }
 
+
+  /*
+   * Public getters/setters
+   */
+
   get constructorInputs(): string[] {
-    const constructorMethod = this.selectedContract.abi.find((method: any) => {
+    const constructorMethod = this._selectedContract.abi.find((method: any) => {
       return method.type === 'constructor';
     });
     if (constructorMethod) {
@@ -210,11 +272,51 @@ export class RunTabComponent implements OnInit {
     return this._loadedContracts;
   }
 
+  get selectedContract(): any {
+    return this._selectedContract;
+  }
+
+  set selectedContract(contract: any) {
+    this._selectedContract = contract;
+  }
+
   get compiling(): boolean {
     return this._compiling;
   }
 
   get lastError(): string {
     return this._lastError;
+  }
+
+  get loadingUtxos(): boolean {
+    return this._loadingUtxos;
+  }
+
+  get utxos(): any[] {
+    return this._utxos;
+  }
+
+  get selectedUtxo(): any {
+    return this._selectedUtxo;
+  }
+
+  set selectedUtxo(utxo: any) {
+    this._selectedUtxo = utxo;
+  }
+
+  get txValue(): number {
+    return this._txValue;
+  }
+
+  set txValue(txValue: number) {
+    this._txValue = txValue;
+  }
+
+  get gasLimit(): number {
+    return this._gasLimit;
+  }
+
+  set gasLimit(gasLimit: number) {
+    this._gasLimit = gasLimit;
   }
 }
