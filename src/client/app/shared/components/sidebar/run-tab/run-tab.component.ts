@@ -115,7 +115,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
 
       // Generate a new block so the contract is mined
       this.rpc.rawCall('generate', [1]).then(() => {
-        return this.rpc.rawCall("gettransactionreceipt", [result.txid]);
+        return this.rpc.rawCall('gettransactionreceipt', [result.txid]);
       }).then((receipt: any) => {
         console.log(receipt);
       });
