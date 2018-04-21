@@ -106,7 +106,9 @@ export class RunTabComponent implements OnInit, OnDestroy {
     this.terminalService.log(`Deploying: ${contract.name}`);
     contract.deploy(args, {
       senderAddress: this._selectedUtxo.address,
-      bytecode: this._selectedContract.evm.bytecode.object
+      bytecode: this._selectedContract.evm.bytecode.object,
+      amount: this._txValue,
+      gasLimit: this._gasLimit
     }).then((result: any) => {
       this.terminalService.log(`Deployed ${contract.name} @${contract.address}`);
       this._loadedContracts.push(contract);
