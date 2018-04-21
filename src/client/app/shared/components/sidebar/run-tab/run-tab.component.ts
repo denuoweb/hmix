@@ -107,14 +107,19 @@ export class RunTabComponent implements OnInit, OnDestroy {
     contract.deploy(args, {
       senderAddress: this._selectedUtxo.address,
       bytecode: this._selectedContract.evm.bytecode.object,
-      amount: this._txValue,
-      gasLimit: this._gasLimit
+      amount: this.txValue,
+      gasLimit: this.gasLimit
     }).then((result: any) => {
       this.terminalService.log(`Deployed ${contract.name} @${contract.address}`);
       this._loadedContracts.push(contract);
 
       // Generate a new block so the contract is mined
-      this.generateBlocks(1);
+      this.rpc.rawCall('generate', [1]).then(() => {
+        return this.rpc.rawCall("gettransactionreceipt", [result.txid]);
+      }).then((receipt: any) => {
+        console.log(receipt);
+      });
+
     }).catch((err: any) => {
       this.terminalService.log(err);
     });
@@ -153,8 +158,8 @@ export class RunTabComponent implements OnInit, OnDestroy {
       this.rpc.rawCall('sendtocontract', [
         contract.address,
         '00000000',
-        this._txValue,
-        this._gasLimit,
+        this.txValue,
+        this.gasLimit,
         0.0000004,
         this._selectedUtxo.address
       ]).then((tx: any) => {
@@ -167,8 +172,8 @@ export class RunTabComponent implements OnInit, OnDestroy {
       // Normall call or send
       transactionType.call(contract, fn.name, args, {
         senderAddress: this._selectedUtxo.address,
-        amount: this._txValue,
-        gasLimit: this._gasLimit
+        amount: this.txValue,
+        gasLimit: this.gasLimit
       }).then((tx: any) => {
         if (fn.constant) {
           this.terminalService.log(`Outputs: ${tx.outputs}`);
@@ -262,14 +267,6 @@ export class RunTabComponent implements OnInit, OnDestroy {
     this.qtumService.rpcUrl = rpcUrl;
   }
 
-  get constructorArgs(): string {
-    return this._constructorArgs;
-  }
-
-  set constructorArgs(args: string) {
-    this._constructorArgs = args;
-  }
-
   get loadedContracts(): any[] {
     return this._loadedContracts;
   }
@@ -307,7 +304,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
   }
 
   get txValue(): number {
-    return this._txValue;
+    return Number(this._txValue);
   }
 
   set txValue(txValue: number) {
@@ -315,7 +312,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
   }
 
   get gasLimit(): number {
-    return this._gasLimit;
+    return Number(this._gasLimit);
   }
 
   set gasLimit(gasLimit: number) {
