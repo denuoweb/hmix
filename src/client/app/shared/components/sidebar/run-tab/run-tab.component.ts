@@ -78,7 +78,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
       for (const address in balances) {
         unsortedBalances[unsortedBalances.length] = {
           address: address,
-          amount: balances[address] 
+          amount: balances[address]
         };
       }
       this._utxos = unsortedBalances.sort((a: any, b: any) => {
