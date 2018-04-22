@@ -28,6 +28,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
   private _selectedUtxo: any;
   private _gasLimit = 400000;
   private _txValue = 0;
+  private _contractAddress: string;
 
   constructor(private compilerService: CompilerService,
               private qtumService: QtumService,
@@ -69,7 +70,18 @@ export class RunTabComponent implements OnInit, OnDestroy {
     this._loadingUtxos = true;
     this.rpc.rawCall('listunspent').then((result: any) => {
       // Return the 10 largest UTXOs by amount
-      this._utxos = result.sort((a: any, b: any) => {
+      const balances: any = {};
+      result.forEach((utxo: any) => {
+        balances[utxo.address] = (balances[utxo.address] || 0) + utxo.amount;
+      });
+      const unsortedBalances: any = [];
+      for (const address in balances) {
+        unsortedBalances[unsortedBalances.length] = {
+          address: address,
+          amount: balances[address] 
+        };
+      }
+      this._utxos = unsortedBalances.sort((a: any, b: any) => {
         return b.amount - a.amount;
       }).slice(0, 10);
 
@@ -80,12 +92,14 @@ export class RunTabComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Deploys the selected contract
+   * Returns the current selected contract as a formatted Contract object
+   * @return A Qtum Contract object with some extra fields
    */
-  deploy(): void {
+  currentQtumContract(): any {
     // Create a qtumjs Contract object
     const contract = new qtumjs.Contract(this.rpc, {
-      abi: this._selectedContract.abi
+      abi: this._selectedContract.abi,
+      address: this._contractAddress
     });
 
     // Make sure the Qtum.js Contract object has a name
@@ -99,6 +113,15 @@ export class RunTabComponent implements OnInit, OnDestroy {
       if (method.type === 'fallback') { method.name = '(fallback)'; }
       return Object.assign({}, method);
     }).reverse();
+
+    return contract;
+  }
+
+  /**
+   * Deploys the selected contract
+   */
+  deploy(): void {
+    const contract = this.currentQtumContract();
 
     const constructorArgs = (<any>this._selectedContract).constructorArgs;
     const args = constructorArgs ? constructorArgs.split(',') : [];
@@ -123,6 +146,15 @@ export class RunTabComponent implements OnInit, OnDestroy {
     }).catch((err: any) => {
       this.terminalService.log(err);
     });
+  }
+
+  /**
+   * Loads a contract at the specified address
+   */
+  atAddress(): void {
+    const contract = this.currentQtumContract();
+    this.terminalService.log(`Loaded ${contract.name} @${contract.address}`);
+    this._loadedContracts.push(contract);
   }
 
   /**
@@ -317,5 +349,13 @@ export class RunTabComponent implements OnInit, OnDestroy {
 
   set gasLimit(gasLimit: number) {
     this._gasLimit = gasLimit;
+  }
+
+  get contractAddress(): string {
+    return this._contractAddress;
+  }
+
+  set contractAddress(address: string) {
+    this._contractAddress = address;
   }
 }

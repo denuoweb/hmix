@@ -13,11 +13,11 @@
 }
 
 .deployment-options {
-  height: 162px;
+  height: 205px;
 }
 
 .contracts {
-  height: calc(100% - 462px);
+  height: calc(100% - 505px);
   overflow-y: overlay;
   overflow-x: hidden;
   display: block;
@@ -51,10 +51,20 @@
 }
 
 .constructor-input-field {
-  display: inline-block;
-  margin-left: 20px;
-  width: 250px;
+  display: block;
+  width: 450px;
   color: white;
+  margin-bottom: 20px;
+}
+
+.constructor-input-field input {
+  width: 295px;
+  margin-right: 5px;
+}
+
+.constructor-input-field a.btn {
+  display: inline-block;
+  width: 150px;
 }
 
 .deploy-button,
