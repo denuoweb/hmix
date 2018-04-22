@@ -67,6 +67,11 @@
   width: 150px;
 }
 
+.constructor-input-field a.btn.disabled {
+  background-color: transparent !important;
+  border-color: #ff7373;
+}
+
 .deploy-button,
 .call-button {
   height: 25px;
