@@ -107,6 +107,8 @@
 }
 
 .contract-details {
+  white-space: nowrap;
+  overflow: hidden;
   padding-left: 10px;
 }
 
