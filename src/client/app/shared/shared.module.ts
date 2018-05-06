@@ -11,6 +11,7 @@ import { EditorComponent } from './components/editor/editor.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FileTabComponent } from './components/sidebar/file-tab/file-tab.component';
 import { CompileTabComponent } from './components/sidebar/compile-tab/compile-tab.component';
+import { DetailsDialogComponent } from './components/sidebar/compile-tab/details-dialog/details-dialog.component';
 import { HelpTabComponent } from './components/sidebar/help-tab/help-tab.component';
 import { RunTabComponent } from './components/sidebar/run-tab/run-tab.component';
 import { TabsComponent } from './components/tabs/tabs.component';
@@ -27,7 +28,9 @@ import { TerminalService } from './services/terminal/terminal.service';
 
 // Material imports
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatProgressBarModule, MatSelectModule } from '@angular/material';
+import {
+  MatProgressBarModule, MatSelectModule, MatDialogModule
+} from '@angular/material';
 
 /**
  * Do not specify providers for modules that might be imported by a lazy loaded module.
@@ -41,7 +44,8 @@ import { MatProgressBarModule, MatSelectModule } from '@angular/material';
     ContextMenuModule.forRoot(),
     BrowserAnimationsModule,
     MatProgressBarModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDialogModule
   ],
   declarations: [
     SidebarComponent,
@@ -51,7 +55,8 @@ import { MatProgressBarModule, MatSelectModule } from '@angular/material';
     CompileTabComponent,
     RunTabComponent,
     HelpTabComponent,
-    TerminalComponent
+    TerminalComponent,
+    DetailsDialogComponent
   ],
   exports: [
     SidebarComponent,
@@ -62,9 +67,13 @@ import { MatProgressBarModule, MatSelectModule } from '@angular/material';
     TerminalComponent,
     RunTabComponent,
     HelpTabComponent,
+    DetailsDialogComponent,
     CommonModule,
     FormsModule,
     RouterModule
+  ],
+  entryComponents: [
+    DetailsDialogComponent
   ]
 })
 export class SharedModule {

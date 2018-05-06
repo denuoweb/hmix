@@ -105,3 +105,17 @@
   display: block;
   color: white;
 }
+
+.contract-details {
+  padding-left: 10px;
+}
+
+.contract-select {
+  width: 250px;
+  display: inline-block;
+  position: relative;
+}
+
+.details-button {
+  margin-left: 10px;
+}

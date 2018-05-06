@@ -1,6 +1,6 @@
 {
   "name": "qmix",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "An in-browser Solidity IDE for Qtum",
   "repository": {
     "type": "git",

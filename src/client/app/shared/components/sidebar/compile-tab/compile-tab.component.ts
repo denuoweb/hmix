@@ -1,15 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material';
 import { Subscription } from 'rxjs/Subscription';
 
+// Components
+import { DetailsDialogComponent } from './details-dialog/details-dialog.component';
+
 // Models
-import { ISolcVersion } from '../../../models/solc-version.model';
-import { ICompilerResult, ICompilerError } from '../../../models/compiler-result.model';
+import {
+  ISolcVersion, ICompilerResult, ICompilerError,
+  ICompilerContract
+} from '../../../models/index';
 
 // Services
-import { FileService } from '../../../services/file/file.service';
-import { EditorService } from '../../../services/editor/editor.service';
-import { CompilerService } from '../../../services/compiler/compiler.service';
-import { SolcVersionsService } from '../../../services/solc-versions/solc-versions.service';
+import {
+  FileService, EditorService, CompilerService,
+  SolcVersionsService
+} from '../../../services/index';
 
 @Component({
   moduleId: module.id,
@@ -17,29 +23,50 @@ import { SolcVersionsService } from '../../../services/solc-versions/solc-versio
   templateUrl: 'compile-tab.component.html',
   styleUrls: ['compile-tab.component.css']
 })
-export class CompileTabComponent implements OnInit {
+export class CompileTabComponent implements OnInit, OnDestroy {
   private _loadingCompiler: boolean;
   private _compilationResult: ICompilerResult = {
     errors: [],
     contracts: []
   };
-  private fileSavedSubscription: Subscription;
-  private compilationSubscription: Subscription;
+  private _fileSavedSub: Subscription;
+  private _compilationSub: Subscription;
   private _compiling: boolean;
   private _selectedVersion: ISolcVersion;
+  private _subsInitialized: boolean;
+  private _selectedContract: ICompilerContract;
 
   constructor(private compilerService: CompilerService,
               private fileService: FileService,
               private editorService: EditorService,
-              private solcVersionsService: SolcVersionsService) {
+              private solcVersionsService: SolcVersionsService,
+              private dialog: MatDialog) {
     this._selectedVersion = solcVersionsService.defaultVersion;
   }
+
+
+  /*
+   * Lifecycle hooks
+   */
 
   ngOnInit() {
     this.solcVersionsService.loadVersions();
     this.loadCompiler();
   }
 
+  ngOnDestroy() {
+    this._fileSavedSub.unsubscribe();
+    this._compilationSub.unsubscribe();
+  }
+
+
+  /*
+   * Public functions
+   */
+
+  /**
+   * Compiles the given current selected file
+   */
   compile(): void {
     const selectedFile = this.fileService.selectedFile;
     if (!selectedFile) {
@@ -58,6 +85,10 @@ export class CompileTabComponent implements OnInit {
     });
   }
 
+  /**
+   * Moves the editor line to highlight a specific error
+   * @param {ICompilerError} error The error we're going to
+   */
   gotoError(error: ICompilerError): void {
     // Some errors might not be referencing a specific line
     if (!error.lineNumber || !error.columnNumber) {
@@ -73,6 +104,33 @@ export class CompileTabComponent implements OnInit {
     this.editorService.gotoLine(error.lineNumber, error.columnNumber);
   }
 
+  /**
+   * Displays a contract details modal for the selected contract
+   */
+  showContractDetails(): void {
+    if (!this._selectedContract) {
+      return;
+    }
+
+    console.log(this.selectedContract);
+    const dialogRef = this.dialog.open(DetailsDialogComponent, {
+      width: '500px',
+      data: this.selectedContract
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
+  }
+
+
+  /*
+   * Private functions
+   */
+
+  /**
+   * Loads the selected compiler and sets up subscriptions
+   */
   private loadCompiler(): void {
     this._loadingCompiler = true;
     this.compilerService.loadCompiler(this.selectedVersion.url).then(() => {
@@ -85,31 +143,48 @@ export class CompileTabComponent implements OnInit {
         this.compile();
       }, 100);
 
-      // Unsubscribe to make sure we don't create multiple subscriptions
-      if (this.fileSavedSubscription) {
-        this.fileSavedSubscription.unsubscribe();
-      }
-      if (this.compilationSubscription) {
-        this.compilationSubscription.unsubscribe();
-      }
-
-      // Set up subscriptions
-      this.fileSavedSubscription = this.fileService.onFileSaved.subscribe(() => {
-        this.compile();
-      });
-      this.compilationSubscription = this.compilerService.onCompilationRequested.subscribe(() => {
-        this.compile();
-      });
+      this.initializeSubs();
     });
   }
 
-  private parseErrorType(errorType: string): string {
-    errorType = errorType.toLowerCase();
-    if (errorType.includes('warning')) {
+  /**
+   * Sets up event subscriptions
+   */
+  private initializeSubs(): void {
+    if (this._subsInitialized) {
+      return;
+    }
+
+    this._fileSavedSub = this.fileService.onFileSaved.subscribe(() => {
+      this.compile();
+    });
+    this._compilationSub = this.compilerService.onCompilationRequested.subscribe(() => {
+      this.compile();
+    });
+
+    this._subsInitialized = true;
+  }
+
+  /**
+   * Returns an error type given an error string
+   * @param {string} errorString An error string
+   * @return {string} The error type
+   */
+  private parseErrorType(errorString: string): string {
+    if (errorString.toLowerCase().includes('warning')) {
       return 'warning';
     } else {
       return 'error';
     }
+  }
+
+
+  /*
+   * Public getters/setters
+   */
+
+  get contracts(): ICompilerContract[] {
+    return this.compilerService.contracts;
   }
 
   get loadingCompiler(): boolean {
@@ -146,5 +221,13 @@ export class CompileTabComponent implements OnInit {
 
   set selectedVersion(version: ISolcVersion) {
     this._selectedVersion = version;
+  }
+
+  get selectedContract(): ICompilerContract {
+    return this._selectedContract;
+  }
+
+  set selectedContract(contract: ICompilerContract) {
+    this._selectedContract = contract;
   }
 }
