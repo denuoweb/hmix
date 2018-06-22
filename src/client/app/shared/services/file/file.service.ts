@@ -12,17 +12,21 @@ import { UUID } from 'angular2-uuid';
 
 @Injectable()
 export class FileService {
+  // set keys to find files in storage
   onFileSaved: EventEmitter<File> = new EventEmitter<File>();
   private _filesKey = 'qmix-files';
   private _selectedFileIdKey = 'qmix-selected-file';
   private _files: File[] = [];
   private _selectedFile: File;
-
+  // get start the storage and editor services
   constructor(private storageService: StorageService,
               private editorService: EditorService) {
     this.loadFileTree();
   }
 
+  // public file functionality functions
+
+  // push into list of files and open it
   createFile(name: string): void {
     const newFile = new File({
       id: UUID.UUID(),
@@ -34,6 +38,8 @@ export class FileService {
     this.openFile(newFile);
   }
 
+  // selector opens the file
+  // sets the editor to display file contents
   selectFile(file: File): void {
     if (!file.isOpen) {
       this.openFile(file);
@@ -42,6 +48,7 @@ export class FileService {
     this.editorService.content = file.tempContent;
   }
 
+  // open file func
   openFile(file: File): void {
     file.isOpen = true;
     this.selectFile(file);
@@ -55,11 +62,11 @@ export class FileService {
   }
 
   saveFile(file: File): void {
-    // Only wany to fire this if we changed the content
+    // Only way to fire this if we changed the content
     if (file.content !== this.editorService.content) {
       this.onFileSaved.emit(file);
     }
-
+    //save contents of the editor into this file
     file.content = this.editorService.content;
     file.isSaved = true;
     this.saveFileTree();
@@ -72,7 +79,6 @@ export class FileService {
     });
     this.saveFileTree();
   }
-
   renameFile(file: File, newName: string): void {
     file.name = newName;
     this.saveFileTree();
@@ -97,11 +103,14 @@ export class FileService {
     });
   }
 
+  // private file functionality functions
+
+  // this function only used by close and delete
+  // will open the next available file if there is one
   private findFileToSelect(lastSelectedFile: File): void {
     if (lastSelectedFile !== this.selectedFile) {
       return;
     }
-
     const fileIndex = this.openFiles.indexOf(lastSelectedFile);
     let newFileIndex: number;
     if (fileIndex === 0) {
@@ -131,6 +140,8 @@ export class FileService {
     });
     this.storageService.set(this._filesKey, fileObjects);
   }
+
+  // getters and setters
 
   get hasUnsavedFiles(): boolean {
     return this._files.some((file) => {

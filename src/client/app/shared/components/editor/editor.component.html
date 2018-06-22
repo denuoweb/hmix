@@ -1,15 +1,17 @@
+<!-- show open files -->
 <div id="file-tab-container" [class.populated]="openFiles.length > 0">
   <div *ngFor="let file of openFiles" class="file-tab" [class.selected]="isSelected(file)" (click)="selectFile(file)" [contextMenu]="fileTabMenu" [contextMenuSubject]="file">
     <span class="file-name noselect">{{ file.name }}</span>
     <span class="close-file-btn">
       <i (click)="closeFile(file)" class="fa fa-times"></i>
     </span>
+    <!-- clsoe button with warning when trying to close unsaved file -->
     <span class="close-file-btn not-saved-indicator">
       <i *ngIf="!file.isSaved" class="fa fa-circle"></i>
     </span>
   </div>
 </div>
-
+<!-- show container for current file being edited -->
 <div [hidden]="!selectedFile" id="ace-container"></div>
 
 <context-menu #fileTabMenu>

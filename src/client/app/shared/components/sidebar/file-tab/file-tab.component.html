@@ -1,18 +1,20 @@
+<!-- side bar file chooser -->
 <div class="qmix-files-title">
   QMIX VERSION: {{ version }}
-
+<!-- new file button -->
   <i class="fa fa-file new-file-btn" id="new-file-btn" (click)="createFile()"></i>
 </div>
-
+<!-- display files -->
 <div class="files-container" [contextMenu]="fileCreationMenu">
+  <!-- first file -->
   <input id="new-file-input" class="new-file-input" name="new-file" *ngIf="isCreatingNewFile" (keydown.enter)="finishEditingFile()">
-
+  <!-- display all files -->
   <div *ngFor="let file of files" class="file-name" [contextMenu]="fileMenu" [contextMenuSubject]="file" (click)="openFile(file)">
     <input *ngIf="file === fileToBeRenamed" id="new-file-input" class="new-file-input" name="file-rename" (keydown.enter)="finishEditingFile()">
     <span *ngIf="file !== fileToBeRenamed">{{ file.name }}</span>
   </div>
 </div>
-
+<!-- right click options -->
 <context-menu #fileMenu (open)="finishEditingFile()">
   <ng-template contextMenuItem (execute)="renameFile($event.item)">
     Rename
@@ -21,7 +23,6 @@
     Delete
   </ng-template>
 </context-menu>
-
 <context-menu #fileCreationMenu (open)="finishEditingFile()">
   <ng-template contextMenuItem (execute)="createFile()">
     New File

@@ -8,6 +8,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { HomeModule } from './home/home.module';
 import { SharedModule } from './shared/shared.module';
 
+/**
+ * all the modules that the app component can use are imported here
+ * will bootstrap their modules for the app component to use
+ * these all mostly take care of html intercewpting and routing
+*/
 
 @NgModule({
   imports: [BrowserModule, HttpClientModule, AppRoutingModule, HomeModule, SharedModule.forRoot()],

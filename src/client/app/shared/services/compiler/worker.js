@@ -1,3 +1,5 @@
+// compiler helper script connects to solc compiler to help compile files
+
 let missingInputs = [];
 
 let compile = () => { return '' };

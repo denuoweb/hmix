@@ -10,6 +10,9 @@ import { CompilerService, QtumService, TerminalService } from '../../../services
 // External imports
 import { qtumjs } from '../../../globals';
 
+// currently everything is set up to work only on testnet
+// TODO add mainnet functionality, connection and deployment of contracts
+
 @Component({
   moduleId: module.id,
   selector: 'sd-run-tab',
@@ -37,6 +40,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
 
   /*
    * Lifecycle hooks
+   * set up compiling subscriptions
    */
 
   ngOnInit() {
@@ -64,7 +68,8 @@ export class RunTabComponent implements OnInit, OnDestroy {
    */
 
   /**
-   * Load unspent transaction outputs
+   * Load unspent transaction outputs from qtum testnet
+   * to be used for contract transactions
    */
   getUtxos(): void {
     this._loadingUtxos = true;
@@ -125,7 +130,8 @@ export class RunTabComponent implements OnInit, OnDestroy {
 
     const constructorArgs = (<any>this._selectedContract).constructorArgs;
     const args = constructorArgs ? constructorArgs.split(',') : [];
-
+    
+    // create variables necessary for transactions
     this.terminalService.log(`Deploying: ${contract.name}`);
     contract.deploy(args, {
       senderAddress: this._selectedUtxo.address,
@@ -172,7 +178,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
     } else {
       transactionType = contract.send;
     }
-
+    // set up loging for the call
     this.terminalService.log(`Calling method: ${fn.name}`);
 
     const logEvents = (tx: any) => {
@@ -201,7 +207,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
         this.generateBlocks(1);
       });
     } else {
-      // Normall call or send
+      // Normal call or send function
       transactionType.call(contract, fn.name, args, {
         senderAddress: this._selectedUtxo.address,
         amount: this.txValue,
@@ -227,7 +233,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Generates some number of blocks
+   * Generates some number of blocks on the testnet
    * @param {number} numBlocks Number of blocks to generate
    */
   generateBlocks(numBlocks: number): void {
@@ -287,6 +293,8 @@ export class RunTabComponent implements OnInit, OnDestroy {
     return this.compilerService.contracts;
   }
 
+  // uses qtum js to connect to qtumrpc 
+  
   get rpc(): any {
     return new qtumjs.QtumRPC(this.rpcUrl);
   }

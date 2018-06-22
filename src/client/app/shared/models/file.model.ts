@@ -1,3 +1,4 @@
+//define what a file object is
 export interface IFileObject {
   id: string;
   name: string;
@@ -5,6 +6,7 @@ export interface IFileObject {
   isOpen: boolean;
 }
 
+//define what a file is
 export interface IFile {
   id: string;
   name: string;
@@ -17,6 +19,7 @@ export interface IFile {
   toObject(): IFileObject;
 }
 
+//file class uses IFile with constructor which requires a file object
 export class File implements IFile {
   id: string;
   name: string;

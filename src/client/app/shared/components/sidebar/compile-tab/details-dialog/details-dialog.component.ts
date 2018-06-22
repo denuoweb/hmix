@@ -6,6 +6,8 @@ import {
   ICompilerContract
 } from '../../../../models/index';
 
+//component to get contract details from compilation
+
 @Component({
   moduleId: module.id,
   selector: 'details-dialog',

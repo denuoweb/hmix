@@ -1,9 +1,10 @@
+<!-- URL to connect to qtum network defaults to testnet at localhost -->
 <div class="rpc-url-input">
   <div class="input-field">
     <input id="qtum-rpc-url" name="qtum-rpc-url" type="text" [(ngModel)]="rpcUrl" (change)="getUnspent()">
     <label for="qtum-rpc-url" class="active">Qtum RPC URL</label>
   </div>
-
+  <!-- loads and displays 10 UTXO's to use-->
   <div *ngIf="loadingUtxos" class="loading-indicator center-align">
     <span>Loading UTXOs...</span>
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -14,7 +15,7 @@
       <mat-option *ngFor="let utxo of utxos" [value]="utxo">{{ utxo.address }} ({{ utxo.amount }})</mat-option>
     </mat-select>
   </mat-form-field>
-
+  <!-- text boxes to change gas limit and transaction values -->
   <div class="input-field">
     <input id="gas-limit" name="gas-limit" type="text" [(ngModel)]="gasLimit">
     <label for="gas-limit" class="active">Gas Limit</label>
@@ -25,7 +26,7 @@
     <label for="tx-value" class="active">Transaction Value</label>
   </div>
 </div>
-
+<!-- show contracts available to deploy and text boxes to give xonstructor arguments -->
 <div class="deployment-options" *ngIf="contracts.length > 0">
   <mat-form-field class="contract-form">
     <mat-select [(value)]="selectedContract">
@@ -38,19 +39,19 @@
     <label for="constructor-inputs" class="active">Constructor Arguments</label>
     <a class="waves-effect waves-light btn deploy-button" (click)="deploy()">Deploy</a>
   </div>
-
+  <!-- give option to get a contract at a specific address -->
   <div class="input-field constructor-input-field">
     <input id="contract-address" name="contract-address" type="text" [(ngModel)]="contractAddress">
     <label for="contract-address" class="active">Contract Address</label>
     <a class="waves-effect waves-light btn deploy-button" [class.disabled]="!contractAddress" (click)="atAddress()">At Address</a>
   </div>
 </div>
-
+<!-- if compiling wait for successfull compilation to show contract options -->
 <div *ngIf="compiling" class="loading-indicator center-align">
   <span *ngIf="compiling">Compiling</span>
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>
-
+<!-- show deployed contracts along with any public functions they have (includes fallback) -->
 <div class="contracts">
   <div *ngFor="let contract of loadedContracts" class="contract-container">
     <span class="contract-name" (click)="toggleExpand(contract)">{{ contract.name }} @{{ contract.address }}</span>

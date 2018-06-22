@@ -1,22 +1,28 @@
 import { Component, OnInit, OnDestroy, HostListener, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
-// Services
+// import Services form shared service index
 import { TabService, StorageService, TerminalService } from '../shared/services/index';
 
-// Constants
+// import Constants from shared constant index
 import {
   STORAGE_KEYS, TABS_WIDTH, DEFAULT_SIDEBAR_WIDTH,
   MIN_SIDEBAR_WIDTH, DEFAULT_TERMINAL_HEIGHT,
   MIN_TERMINAL_HEIGHT
 } from '../shared/constants/index';
 
+// home component is in charge of setting up the app environent
+// keeps check of GUI values and resizing
+
+// set selector for html output
+// routing name in home-routing.module.ts
 @Component({
   moduleId: module.id,
   selector: 'sd-home',
   templateUrl: 'home.component.html',
   styleUrls: ['home.component.css'],
 })
+
 export class HomeComponent implements OnInit, OnDestroy {
   private _terminalHeight: number;
   private _sidebarWidth: number;
@@ -75,6 +81,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       const currentX = event.clientX;
 
       // Calculate a new width
+      // currently allows 0, will leave for now
+      // intuitive to get it back after??
       if (currentX > MIN_SIDEBAR_WIDTH) {
         const newWidth = this.sidebarWidth + currentX - this._lastX;
         this.sidebarWidth = Math.min(Math.max(newWidth, MIN_SIDEBAR_WIDTH), this.maxSidebarWidth);
@@ -87,11 +95,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       const currentY = event.clientY;
 
       // Calculate a new height
+      // dont allow smaller height than min
       if (currentY < this.windowHeight - MIN_TERMINAL_HEIGHT) {
         const newHeight = this.terminalHeight - currentY + this._lastY;
         this.terminalHeight = Math.min(Math.max(newHeight, MIN_TERMINAL_HEIGHT), this.maxTerminalHeight);
       } else {
-        this.terminalHeight = 0;
+        this.terminalHeight = MIN_TERMINAL_HEIGHT;
       }
 
       this._lastY = currentY;

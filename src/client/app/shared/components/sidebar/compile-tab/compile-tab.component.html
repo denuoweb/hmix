@@ -1,19 +1,20 @@
+<!-- display current compiler version being used -->
 <div *ngIf="compilerVersion" class="compiler-version">Solc Version: {{ compilerVersion }}</div>
-
+<!-- loading bar when l;oading new compiler -->
 <div *ngIf="loadingCompiler" class="loading-indicator center-align">
     <span>Loading Compiler</span>
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>
-
+<!-- display compiler options -->
 <div *ngIf="!loadingCompiler" class="main-container">
   <div class="compile-container">
     <a class="waves-effect waves-light btn compile-button" (click)="compile()">Compile</a>
-
+    <!-- auto compile option -->
     <div class="auto-compile-input">
       <input type="checkbox" name="auto-compile" id="auto-compile" [(ngModel)]="autoCompile">
       <label for="auto-compile" [class.highlight]="autoCompile">Auto Compile</label>
     </div>
-
+    <!-- select compiler version -->
     <div class="solc-version-select">
       <mat-form-field>
         <mat-select [(value)]="selectedVersion" (selectionChange)="loadCompiler()">
@@ -22,19 +23,19 @@
       </mat-form-field>
     </div>
   </div>
-
+  <!-- loading bar for when compiling -->
   <div *ngIf="compiling" class="loading-indicator center-align">
     <span>Compiling</span>
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
-
+  <!-- display ciompilation results -->
   <div *ngIf="!compiling" class="contract-details">
     <mat-form-field  class="contract-select">
       <mat-select [(value)]="selectedContract">
         <mat-option *ngFor="let contract of contracts" [value]="contract">{{ contract.name }}</mat-option>
       </mat-select>
     </mat-form-field>
-
+    <!-- button to show contract details in a dialogue box -->
     <a class="waves-effect waves-light btn details-button compile-button" (click)="showContractDetails()">Details</a>
   </div>
 
@@ -42,7 +43,7 @@
     <div *ngIf="errors.length === 0" class="compilation-error error-noerror">
       Everything looks good!
     </div>
-
+    <!-- display errors if present -->
     <div *ngFor="let error of errors" class="compilation-error error-type-{{ parseErrorType(error.errorType) }} noselect" (click)="gotoError(error)">
       <div *ngIf="error.lineNumber">{{ error.fileName }}:{{ error.lineNumber }}:{{ error.columnNumber }}: {{ error.errorType }}:</div>
       <div *ngIf="!error.lineNumber">{{ error.errorType }}:</div>

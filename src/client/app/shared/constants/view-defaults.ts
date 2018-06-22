@@ -1,3 +1,6 @@
+//default sizes for the different componenets on the page
+//add any new defaults here
+
 export const TABS_WIDTH = 50;
 
 export const DEFAULT_SIDEBAR_WIDTH = 200;

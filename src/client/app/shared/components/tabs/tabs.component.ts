@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { ITab } from '../../models/tab.model';
 import { TabService } from '../../services/tab/tab.service';
 
+// in charge of initializing the tab service
+
 @Component({
   moduleId: module.id,
   selector: 'sd-tabs',

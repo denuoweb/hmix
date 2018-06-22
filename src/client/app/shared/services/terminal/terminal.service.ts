@@ -1,5 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 
+// terminal service just keeps track of logs and displays them
+
 @Injectable()
 export class TerminalService {
   onTerminalOpenRequest: EventEmitter<void> = new EventEmitter<void>();

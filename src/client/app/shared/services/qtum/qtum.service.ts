@@ -12,6 +12,10 @@ import { STORAGE_KEYS } from '../../constants/storage-keys';
 // External imports
 import { qtumjs } from '../../globals';
 
+// default to localhost where user will be running a testnet
+// currently setup to specifically run on testnet
+// TODO implement mainnet functionality
+
 @Injectable()
 export class QtumService {
   private _defaultRpcUrl = 'http://qtum:test@localhost:9888';

@@ -17,17 +17,22 @@ import { VERSION } from '../../../constants/version';
   styleUrls: ['file-tab.component.css']
 })
 export class FileTabComponent implements AfterViewInit {
+  // file manipulation booleans
   isCreatingNewFile = false;
   isRenamingFile = false;
   fileToBeRenamed: File;
   version = VERSION;
-
+  // requires a File Setvice to manipulate files
+  // requires compiler service to try to compile files
   constructor(private fileService: FileService,
               private compilerService: CompilerService) { }
 
   ngAfterViewInit() {
     this.watchInputClick();
   }
+
+  // public file funcitons
+  // use file service to perform actions
 
   get files(): File[] {
     return this.fileService.sortedFiles;
@@ -60,6 +65,8 @@ export class FileTabComponent implements AfterViewInit {
     }, 100);
   }
 
+  //check for new file click action
+  //set context menus
   private watchInputClick(): void {
     document.addEventListener('click', (event: MouseEvent) => {
       if ((<any>event.target).id === 'new-file-btn') {
@@ -72,6 +79,8 @@ export class FileTabComponent implements AfterViewInit {
     });
   }
 
+  // check what is being done with file
+  // rename or create file
   private finishEditingFile(event?: MouseEvent): void {
     if (!this.isCreatingNewFile && !this.isRenamingFile) {
       return;

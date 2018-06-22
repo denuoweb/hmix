@@ -1,3 +1,5 @@
+<!-- ngfor lists all the tab options in our component -->
+<!-- set icon and active status -->
 <ul class="sidebar-tabs">
   <li *ngFor="let tab of tabService.tabs" (click)="selectTab(tab)" [class.active]="tab.active"><i class="fa {{ tab.icon }}"></i></li>
 </ul>

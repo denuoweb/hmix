@@ -33,19 +33,27 @@ export class CompilerService {
     contracts: []
   };
 
+  // needs to access storage and files
   constructor(private storageService: StorageService,
               private fileService: FileService) {
     this.loadSettings();
   }
 
+  // compilation function takes in source files and their contents
+  // compile takes in sources and sets retry boolean to true by default
+  // returns promise of compiler result
   async compile(sources: {
     [fileName: string]: {
       [content: string]: string
-    }
+    } 
   }, retry = true): Promise<ICompilerResult> {
+    // compile using wither webworker or direct compile
     const compilationPromise = this.useWebWorker ? this.compileWebWorker(sources) : this.compileSync(sources);
     this.onCompilationStarted.emit();
+    // wait for compilation promise
     return new Promise<ICompilerResult>((resolve, reject) => {
+      // if compilation was missing inputs and retry is true, get imports and try to compile again
+      // this time compile is called with retry set to false as imports were gathered
       compilationPromise.then((result) => {
         if (result.missingInputs) {
           sources = this.gatherImports(sources, result.missingInputs);
@@ -53,11 +61,14 @@ export class CompilerService {
             this.compile(sources, false).then((result) => {
               resolve(result);
             });
+          // file compiled with imports still missing inputs 
+          // parse the results (will contain error)
           } else {
             this.parseCompilationResult(result);
             this.onCompilationFinished.emit();
             resolve(this._latestCompilationResult);
           }
+        // compilation went through, parse results
         } else {
           this.parseCompilationResult(result);
           this.onCompilationFinished.emit();
@@ -67,6 +78,8 @@ export class CompilerService {
     });
   }
 
+  // load compiler for requested solidity version
+  // either use web worker or loadsync
   async loadCompiler(solcUrl: string): Promise<void> {
     return this.useWebWorker ? this.loadWebWorker(solcUrl) : this.loadSync(solcUrl);
   }
@@ -75,6 +88,8 @@ export class CompilerService {
     this.onCompilationRequested.emit();
   }
 
+  // when not using webworker
+  // from solc url connect to appropriate version of solc compiler
   private async loadSync(solcUrl: string): Promise<void> {
     delete (<any>window).Module;
     (<any>window).Module = undefined;
@@ -97,6 +112,8 @@ export class CompilerService {
     });
   }
 
+  // use the worker helper file to load and connect to solc compiler for appropriate version
+  // webworker option will use worker for compilation
   private async loadWebWorker(solcUrl: string): Promise<void> {
     if (!(<any>window).Worker) {
       this.useWebWorker = false;
@@ -134,11 +151,14 @@ export class CompilerService {
     });
   }
 
+  // non webworker compile function
+  // takes in source files returns promise of compilation result
   private compileSync(sources: {
     [fileName: string]: {
       [content: string]: string
     }
   }): Promise<any> {
+    // call on solc compiler to compile files
     return new Promise<any>((resolve, reject) => {
       const input = compilerInput(sources, this.optimize);
       const missingInputs: any[] = [];
@@ -155,11 +175,15 @@ export class CompilerService {
     });
   }
 
+  // compile function when using web worker
+  // defers compilation to worker.js helper
   private compileWebWorker(sources: {
     [fileName: string]: {
       [content: string]: string
     }
   }): Promise<any> {
+    // uses worker to connect to solc compiler to compile files given
+    // returns promise of compilations results
     return new Promise<any>((resolve, reject) => {
       const input = compilerInput(sources, this.optimize);
       this.webWorker.postMessage({
@@ -173,13 +197,15 @@ export class CompilerService {
     });
   }
 
+  // get all the imports to be able to properly compile
+  // called when first round of compilation was missing inputs
   private gatherImports(sources: {
     [fileName: string]: {
       [content: string]: string
     }
   }, missingFiles: string[] = []): any {
     const importRegex = /^\s*import\s*[\'\"]([^\'\"]+)[\'\"];/g;
-
+    //find import files in path
     for (const fileName in sources) {
       let match;
       while ((match = importRegex.exec(sources[fileName].content))) {
@@ -187,30 +213,33 @@ export class CompilerService {
         if (importFilePath.startsWith('./')) {
           importFilePath = importFilePath.slice(2);
         }
-
+        // if not in missing path list add import file to list
         if (!missingFiles.includes(importFilePath)) {
           missingFiles.push(importFilePath);
         }
       }
     }
-
+    // check for all missing files
     while (missingFiles.length > 0) {
       const missingFile = missingFiles.pop();
+      // if already in sources continue
       if (missingFile in sources) {
         continue;
       }
-
+      // check if file can be found in library
       const foundFile = this.fileService.getFileByName(missingFile);
+      // if so add to sources with its contents
       if (foundFile) {
         sources[foundFile.name] = {
           content: foundFile.content
         };
       }
     }
-
+    // return sources wih all new imports, to try and compile again
     return sources;
   }
 
+  //check which parsing error was found, reports back with location and error
   private parseError(error: string): ICompilerError {
     const pattern: any = /(.*?):(\d+):(\d+): (.*?): ([^]+)/g;
     const match = pattern.exec(error);
@@ -235,6 +264,7 @@ export class CompilerService {
     };
   }
 
+  // check compilation result for errors if any
   private parseErrors(result: any): void {
     const errors: any = [];
     if (result.error) {
@@ -251,13 +281,14 @@ export class CompilerService {
     const filteredErrors = errors.filter((error: any) => {
       return !error.message.includes('invalid checksum');
     });
-
+    // get error messages
     this._latestCompilationResult.errors = [];
     for (const error of filteredErrors) {
       this._latestCompilationResult.errors.push(this.parseError(error.formattedMessage));
     }
   }
 
+  // from compilation results parse contracts
   private parseContracts(result: any): void {
     if (!result.contracts) {
       return;
@@ -280,12 +311,14 @@ export class CompilerService {
     });
   }
 
+  // parse the contracts and any errors from the compilation result
   private parseCompilationResult(result: any): void {
     const resultObject = JSON.parse(result.result);
     this.parseContracts(resultObject);
     this.parseErrors(resultObject);
   }
 
+  // load settings, all true by default
   private loadSettings(): void {
     this._settings = this.storageService.get(STORAGE_KEYS['compilerSettings']) || {
       useWebWorker: true,
@@ -297,6 +330,8 @@ export class CompilerService {
   private saveSettings(): void {
     this.storageService.set(STORAGE_KEYS['compilerSettings'], this._settings);
   }
+
+  // public getters and setters
 
   get useWebWorker(): boolean {
     return this._settings.useWebWorker;

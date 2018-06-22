@@ -4,6 +4,7 @@ import './operators';
 
 /**
  * This class represents the main application component.
+ * app module bootstrapped the necessary modules to the component
  */
 @Component({
   moduleId: module.id,

@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { TabService } from '../../services/tab/tab.service';
 
+//use tabs service to get active tab names and status
+
 @Component({
   moduleId: module.id,
   selector: 'sd-sidebar',

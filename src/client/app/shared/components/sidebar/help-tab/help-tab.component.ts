@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 // Constants
 import { HELP_COMMANDS } from '../../../constants/index';
 
+// help commands contains tesnet url change that if new one is needed
+
 @Component({
   moduleId: module.id,
   selector: 'sd-help-tab',

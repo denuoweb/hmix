@@ -1,5 +1,6 @@
+<!-- display the name of the active tab -->
 <div class="tab-name noselect">{{ tabService.activeTab.displayName }}</div>
-
+<!-- find the tab that is active and display respective tab component, hide all others -->
 <sd-file-tab class="sidebar-tab" [class.hidden]="!activeTabNameIs('file')"></sd-file-tab>
 <sd-compile-tab class="sidebar-tab" [class.hidden]="!activeTabNameIs('compile')"></sd-compile-tab>
 <sd-run-tab class="sidebar-tab" [class.hidden]="!activeTabNameIs('run')"></sd-run-tab>

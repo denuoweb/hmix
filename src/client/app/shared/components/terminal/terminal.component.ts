@@ -89,7 +89,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
       this.terminalService.clear();
     } else {
       this.qtumService.rpc.rawCall(command, args).then((result: any) => {
-        // Stringify the result
+        // Stringify the result on the transaction calls
+        // log them
         result = result instanceof Object ? JSON.stringify(result, null, '\t') : result;
         this.terminalService.log(result);
       }).catch((err: any) => {

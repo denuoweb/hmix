@@ -47,6 +47,9 @@ export class CompileTabComponent implements OnInit, OnDestroy {
 
   /*
    * Lifecycle hooks
+   * 
+   * init gets available solidity compiler versions
+   * defaults to latest
    */
 
   ngOnInit() {
@@ -68,16 +71,19 @@ export class CompileTabComponent implements OnInit, OnDestroy {
    * Compiles the given current selected file
    */
   compile(): void {
+    // get files for compilation from the file service
     const selectedFile = this.fileService.selectedFile;
     if (!selectedFile) {
       return;
     }
-
+    // get the content of the files plus the one in the editor currently
     const sources: any = {};
     sources[selectedFile.name] = {
       'content': this.editorService.content
     };
-
+    // start compilation
+    // defer compilation to compile service and compile
+    // get result and stop compilation
     this._compiling = true;
     this.compilerService.compile(sources).then((result) => {
       this._compilationResult = result;

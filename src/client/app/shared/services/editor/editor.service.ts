@@ -15,6 +15,8 @@ export class EditorService {
     this._editor.gotoLine(lineNumber, columnNumber - 1, true);
   }
 
+  //basic editor functions
+
   highlightLine(lineNumber: number): void {
     if (this._marker) {
       this.removeMarker();

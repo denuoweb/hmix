@@ -19,7 +19,7 @@ Qmix extends [angular-seed](https://github.com/mgechev/angular-seed), an Angular
 The fastest way to get started developing Qmix is to use the livereload functionality provided by Angular Seed. You'll first have to clone and access this repository.
 
 ```bash
-$ git clone https://github.com/kfichter/qmix-revamp.git
+$ git clone https://github.com/spacemanholdings/qmix.git
 $ cd qmix
 
 # install dependencies
