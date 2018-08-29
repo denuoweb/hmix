@@ -130,7 +130,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
 
     const constructorArgs = (<any>this._selectedContract).constructorArgs;
     const args = constructorArgs ? constructorArgs.split(',') : [];
-    
+
     // create variables necessary for transactions
     this.terminalService.log(`Deploying: ${contract.name}`);
     contract.deploy(args, {
@@ -293,8 +293,8 @@ export class RunTabComponent implements OnInit, OnDestroy {
     return this.compilerService.contracts;
   }
 
-  // uses qtum js to connect to qtumrpc 
-  
+  // uses qtum js to connect to qtumrpc
+
   get rpc(): any {
     return new qtumjs.QtumRPC(this.rpcUrl);
   }

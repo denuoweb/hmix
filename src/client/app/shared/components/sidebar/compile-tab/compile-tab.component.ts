@@ -47,7 +47,7 @@ export class CompileTabComponent implements OnInit, OnDestroy {
 
   /*
    * Lifecycle hooks
-   * 
+   *
    * init gets available solidity compiler versions
    * defaults to latest
    */

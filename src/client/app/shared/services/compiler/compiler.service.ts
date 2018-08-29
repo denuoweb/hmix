@@ -45,7 +45,7 @@ export class CompilerService {
   async compile(sources: {
     [fileName: string]: {
       [content: string]: string
-    } 
+    }
   }, retry = true): Promise<ICompilerResult> {
     // compile using wither webworker or direct compile
     const compilationPromise = this.useWebWorker ? this.compileWebWorker(sources) : this.compileSync(sources);
@@ -61,7 +61,7 @@ export class CompilerService {
             this.compile(sources, false).then((result) => {
               resolve(result);
             });
-          // file compiled with imports still missing inputs 
+          // file compiled with imports still missing inputs
           // parse the results (will contain error)
           } else {
             this.parseCompilationResult(result);
