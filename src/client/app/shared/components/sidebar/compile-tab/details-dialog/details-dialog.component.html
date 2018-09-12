@@ -4,5 +4,7 @@
   <div>
     <h5>Bytecode</h5>
     <p class="bytecode">{{ contract.evm.bytecode.object }}</p>
+    <h5>ABI</h5>
+    <p class="bytecode">{{ contract.abi[0] | json }}</p>    
   </div>
 </div>
