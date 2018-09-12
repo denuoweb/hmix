@@ -8,6 +8,7 @@ export const compilerInput = (sources: any, optimize: boolean = false, libraries
         enabled: optimize,
         runs: 200
       },
+      evmVersion: "homestead",
       libraries: libraries,
       outputSelection: {
         '*': {
