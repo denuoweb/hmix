@@ -12,7 +12,7 @@ import { ISolcVersion } from '../../models/solc-version.model';
 export class SolcVersionsService {
   private _baseSolcUrl = 'https://ethereum.github.io/solc-bin/bin/';
   private _defaultVersion: ISolcVersion = {
-    name: 'latest local version',
+    name: 'bundled version',
     url: '/ext/soljson-v0.4.25.js'
   };
   private _solcVersions: ISolcVersion[] = [];
