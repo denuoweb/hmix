@@ -1,7 +1,7 @@
 {
-  "name": "qmix",
+  "name": "hmix",
   "version": "0.0.4",
-  "description": "An in-browser Solidity IDE for Qtum",
+  "description": "An in-browser Solidity IDE for Htmlcoin",
   "repository": {
     "type": "git",
     "url": "https://github.com/kfichter/qmix-revamp"
