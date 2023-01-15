@@ -10,15 +10,15 @@ import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../../constants/storage-keys';
 
 // External imports
-import { qtumjs } from '../../globals';
+import { htmlcoinjs } from '../../globals';
 
 // default to localhost where user will be running a testnet
 // currently setup to specifically run on testnet
 // TODO implement mainnet functionality
 
 @Injectable()
-export class QtumService {
-  private _defaultRpcUrl = 'http://qtum:test@localhost:9888';
+export class HtmlcoinService {
+  private _defaultRpcUrl = 'http://htmlcoin:test@localhost:4888';
 
   constructor(private storageService: StorageService) { }
 
@@ -31,6 +31,6 @@ export class QtumService {
   }
 
   get rpc(): any {
-    return new qtumjs.QtumRPC(this.rpcUrl);
+    return new htmlcoinjs.HtmlcoinRPC(this.rpcUrl);
   }
 }
