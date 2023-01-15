@@ -2,7 +2,7 @@ import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@ang
 import { Subscription } from 'rxjs/Subscription';
 
 // Services
-import { TerminalService, QtumService } from '../../services/index';
+import { TerminalService, HtmlcoinService } from '../../services/index';
 
 @Component({
   moduleId: module.id,
@@ -18,7 +18,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   private _historyIndex = 0;
 
   constructor(private terminalService: TerminalService,
-              private qtumService: QtumService) { }
+              private htmlcoinService: HtmlcoinService) { }
 
 
   /*
@@ -88,7 +88,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     if (command === 'clear') {
       this.terminalService.clear();
     } else {
-      this.qtumService.rpc.rawCall(command, args).then((result: any) => {
+      this.htmlcoinService.rpc.rawCall(command, args).then((result: any) => {
         // Stringify the result on the transaction calls
         // log them
         result = result instanceof Object ? JSON.stringify(result, null, '\t') : result;

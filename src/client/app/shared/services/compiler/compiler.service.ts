@@ -277,7 +277,7 @@ export class CompilerService {
     }
 
     // Exclude invalid checksum errors
-    // TODO: Handle this properly by checking if the address is a valid Qtum address
+    // TODO: Handle this properly by checking if the address is a valid Htmlcoin address
     const filteredErrors = errors.filter((error: any) => {
       return !error.message.includes('invalid checksum');
     });

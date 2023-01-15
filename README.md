@@ -1,11 +1,11 @@
-Qmix
+Hmix
 ===
 
 ## Introduction
 
-Qmix is an in-browser Solidity IDE based on Ethereum's [remix](https://github.com/ethereum/remix) that takes (extensive) style inspiration from Microsoft's [vscode](https://github.com/Microsoft/vscode). 
+Hmix is an in-browser Solidity IDE based on Ethereum's [remix](https://github.com/ethereum/remix) that takes (extensive) style inspiration from Microsoft's [vscode](https://github.com/Microsoft/vscode). 
 
-Qmix extends [angular-seed](https://github.com/mgechev/angular-seed), an Angular 2+ seed project. Detailed information and best practices are available at the project's [README](https://github.com/mgechev/angular-seed/blob/master/README.md). 
+Hmix extends [angular-seed](https://github.com/mgechev/angular-seed), an Angular 2+ seed project. Detailed information and best practices are available at the project's [README](https://github.com/mgechev/angular-seed/blob/master/README.md). 
 
 ## Getting Started
 
@@ -16,11 +16,11 @@ Qmix extends [angular-seed](https://github.com/mgechev/angular-seed), an Angular
 
 ### Development Quick Start
 
-The fastest way to get started developing Qmix is to use the livereload functionality provided by Angular Seed. You'll first have to clone and access this repository.
+The fastest way to get started developing Hmix is to use the livereload functionality provided by Angular Seed. You'll first have to clone and access this repository.
 
 ```bash
-$ git clone https://github.com/spacemanholdings/qmix.git
-$ cd qmix
+$ git clone https://github.com/spacemanholdings/hmix.git
+$ cd hmix
 
 # install dependencies
 $ npm install
@@ -31,7 +31,7 @@ $ npm start
 
 ### Building
 
-The easiest way to build Qmix for production is via the provided build script.
+The easiest way to build Hmix for production is via the provided build script.
 
 ```bash
 $ npm run build.prod
@@ -46,8 +46,8 @@ These are already set for you and you won't need to set them yourself, this info
 
 ## Project Structure
 
-`angular-seed` is structured into two main folders, `src` and `tools`. `src` contains the main front-end code for Qmix while `tools` contains project configuration.
+`angular-seed` is structured into two main folders, `src` and `tools`. `src` contains the main front-end code for Hmix while `tools` contains project configuration.
 
-Qmix has one main page, `home`. This page contains a code editor and some tooling. The home page is split into three panels, the `tabs` panel, the `sidebar` panel, and the `editor` panel. For simplicity, each of these components is implemented as an individual module available in `src/client/app/shared/components`. 
+Hmix has one main page, `home`. This page contains a code editor and some tooling. The home page is split into three panels, the `tabs` panel, the `sidebar` panel, and the `editor` panel. For simplicity, each of these components is implemented as an individual module available in `src/client/app/shared/components`. 
 
 Several services are used to share data and functionality among components. The `compiler` service handles loading solcjs and compiling Solidity code. The `editor` service controls access to the current text of the code editor. The `file` service manages how files are added, deleted, opened, and closed.

@@ -6,7 +6,7 @@ IF YOU DON'T FILL OUT THE FOLLOWING INFORMATION WE MIGHT CLOSE YOUR ISSUE WITHOU
 ```
 [ ] bug report => search github for a similar issue or PR before submitting
 [ ] feature request
-[ ] support request => Please do not submit support request here, instead see use [gitter](https://gitter.im/qtum-project/Lobby)
+[ ] support request
 ```
 
 **Current behavior**
@@ -27,7 +27,7 @@ please provide the *STEPS TO REPRODUCE* and if possible a *MINIMAL DEMO* of the 
 **Please tell us about your environment:**
 <!-- Operating system, IDE, package manager, HTTP server, ... -->
 
-* **Qmix Version:** `aaaaf75`
-<!-- Check which is the hash of the last commit from qmix that you have locally -->
+* **Hmix Version:** `aaaaf75`
+<!-- Check which is the hash of the last commit from hmix that you have locally -->
 
 * **Node:** `node --version` =

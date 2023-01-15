@@ -4,7 +4,7 @@
   "description": "An in-browser Solidity IDE for Htmlcoin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kfichter/qmix-revamp"
+    "url": "https://github.com/htmlcoin/hmix"
   },
   "scripts": {
     "build.tools": "tsc && gulp build.tools --color",

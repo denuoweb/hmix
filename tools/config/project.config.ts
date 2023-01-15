@@ -13,7 +13,7 @@ export class ProjectConfig extends SeedConfig {
 
   constructor() {
     super();
-    this.APP_TITLE = 'Qmix';
+    this.APP_TITLE = 'Hmix';
     // this.GOOGLE_ANALYTICS_ID = 'Your site's ID';
 
     /* Enable typeless compiler runs (faster) between typed compiler runs. */
@@ -32,7 +32,7 @@ export class ProjectConfig extends SeedConfig {
     // Add `local` third-party libraries to be injected/bundled.
     this.APP_ASSETS = [
       {src: `${this.APP_SRC}/ext/solc.bundle.js`, inject: true, vendor: false},
-      {src: `${this.APP_SRC}/ext/qtumjs.bundle.js`, inject: true, vendor: false},
+      {src: `${this.APP_SRC}/ext/htmlcoinjs.bundle.js`, inject: true, vendor: false},
       {src: `${this.CSS_SRC}/font-awesome.min.css`, inject: true, vendor: false},
       {src: `${this.CSS_SRC}/materialize.min.css`, inject: true, vendor: false}
     ];

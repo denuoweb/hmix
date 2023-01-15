@@ -1,19 +1,19 @@
 <!-- instructions to deploy testnet -->
-<h4>Getting Started With Qmix</h4>
+<h4>Getting Started With Hmix</h4>
 <p>
-  It's pretty simple to get started with Qmix, but you'll want to install a few things to make development easier.
+  It's pretty simple to get started with Hmix, but you'll want to install a few things to make development easier.
 </p>
 
 <h5>Regtest Mode</h5>
 <p>
-  You'll need to have a Qtum node running in order to deploy contracts. When developing contracts, we usually recommend running a node in regtest mode, a private development mode that allows you to quickly test contracts and transactions before deploying them to the Qtum testnet or mainnet.
+  You'll need to have a Htmlcoin node running in order to deploy contracts. When developing contracts, we usually recommend running a node in regtest mode, a private development mode that allows you to quickly test contracts and transactions before deploying them to the Htmlcoin testnet or mainnet.
 </p>
 <p>
-  The easiest way to spin up a regtest node is to use qtumportal, a prebuilt regtest environment with a web interface. We're going to use docker to speed things up.
+  The easiest way to spin up a regtest node is to use htmlcoinportal, a prebuilt regtest environment with a web interface. We're going to use docker to speed things up.
 </p>
 <pre>{{ helpCommands.docker }}</pre>
 <p>
-  To make sure we have enough Qtum to deploy contracts, we also want to generate a few blocks. In another terminal, enter the following commands:
+  To make sure we have enough Htmlcoin to deploy contracts, we also want to generate a few blocks. In another terminal, enter the following commands:
 </p>
 <pre>{{ helpCommands.generateInitial }}</pre>
 <p>
@@ -22,7 +22,7 @@
 
 <h5>Building Contracts</h5>
 <p>
-  Qtum uses the Ethereum Virtual Machine, so smart contracts are written in Solidity. The best way to learn to write smart contracts is to read the <a href="https://solidity.readthedocs.io/en/develop/" target="_blank">documentation</a>.
+  Htmlcoin uses the Ethereum Virtual Machine, so smart contracts are written in Solidity. The best way to learn to write smart contracts is to read the <a href="https://solidity.readthedocs.io/en/develop/" target="_blank">documentation</a>.
 </p>
 
 <h5>Compiling/Debugging</h5>
@@ -35,13 +35,13 @@
 
 <h5>Deploying Contracts</h5>
 <p>
-  Once you've written your contract, you'll probably want to deploy it and test the contract methods out. To do this, head over to the deploy/run tab. Here, you'll see an input field called "Qtum RPC URL" and a dropdown that contains the contracts of whatever file you currently have open.
+  Once you've written your contract, you'll probably want to deploy it and test the contract methods out. To do this, head over to the deploy/run tab. Here, you'll see an input field called "Htmlcoin RPC URL" and a dropdown that contains the contracts of whatever file you currently have open.
 </p>
 <p>
-  The Qtum RPC URL input should point to the RPC URL of your node. If you used the above docker command to launch your Qtum regtest node, then that URL should match the default http://qtum:test@localhost:9888.
+  The Htmlcoin RPC URL input should point to the RPC URL of your node. If you used the above docker command to launch your Htmlcoin regtest node, then that URL should match the default http://htmlcoin:test@localhost:9888.
 </p>
 <p>
-  To deploy a contract, you'll first need to supply any constructor arguments you specified. These arguments are entered as a comma separated string. Then, you can hit the "deploy" button to deploy your contract to your Qtum node.
+  To deploy a contract, you'll first need to supply any constructor arguments you specified. These arguments are entered as a comma separated string. Then, you can hit the "deploy" button to deploy your contract to your Htmlcoin node.
 </p>
 <p>
   Now, you should see a terminal log telling you that your contract has been deployed. You should also see your contract pop up in the run tab. This means you can start to send transactions and make contract calls.
@@ -49,8 +49,8 @@
 
 <h5>Sending Transactions</h5>
 <p>
-  Qmix allows you to test your contracts by sending transactions and making contract calls. All you need to do is enter arguments into the method's input field and hit the method's respective button. 
+  Hmix allows you to test your contracts by sending transactions and making contract calls. All you need to do is enter arguments into the method's input field and hit the method's respective button. 
 </p>
 <p>
-  Qmix automatically generates new blocks after each transaction so you'll instantly get a response back.
+  Hmix automatically generates new blocks after each transaction so you'll instantly get a response back.
 </p>

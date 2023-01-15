@@ -91,7 +91,7 @@ export class EditorComponent implements AfterViewInit {
 
     // Technically we're using a custom javascript mode (styling/solidity.mode.ts)
     this._editor.getSession().setMode('ace/mode/javascript');
-    this._editor.setTheme('ace/theme/qmix');
+    this._editor.setTheme('ace/theme/hmix');
 
     // Let the file service know whenever we've changed the current file
     this._editor.getSession().on('change', () => {

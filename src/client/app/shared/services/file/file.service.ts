@@ -14,8 +14,8 @@ import { UUID } from 'angular2-uuid';
 export class FileService {
   // set keys to find files in storage
   onFileSaved: EventEmitter<File> = new EventEmitter<File>();
-  private _filesKey = 'qmix-files';
-  private _selectedFileIdKey = 'qmix-selected-file';
+  private _filesKey = 'hmix-files';
+  private _selectedFileIdKey = 'hmix-selected-file';
   private _files: File[] = [];
   private _selectedFile: File;
   // get start the storage and editor services

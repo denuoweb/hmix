@@ -23,7 +23,7 @@ import { EditorService } from './services/editor/editor.service';
 import { TabService } from './services/tab/tab.service';
 import { CompilerService } from './services/compiler/compiler.service';
 import { SolcVersionsService } from './services/solc-versions/solc-versions.service';
-import { QtumService } from './services/qtum/qtum.service';
+import { HtmlcoinService } from './services/htmlcoin/htmlcoin.service';
 import { TerminalService } from './services/terminal/terminal.service';
 
 // Material imports
@@ -87,7 +87,7 @@ export class SharedModule {
         TabService,
         CompilerService,
         SolcVersionsService,
-        QtumService,
+        HtmlcoinService,
         TerminalService
       ]
     };

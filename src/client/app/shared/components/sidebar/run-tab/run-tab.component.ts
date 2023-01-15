@@ -5,10 +5,10 @@ import { Subscription } from 'rxjs/Subscription';
 import { ICompilerContract } from '../../../models/index';
 
 // Services
-import { CompilerService, QtumService, TerminalService } from '../../../services/index';
+import { CompilerService, HtmlcoinService, TerminalService } from '../../../services/index';
 
 // External imports
-import { qtumjs } from '../../../globals';
+import { htmlcoinjs } from '../../../globals';
 
 // currently everything is set up to work only on testnet
 // TODO add mainnet functionality, connection and deployment of contracts
@@ -34,7 +34,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
   private _contractAddress: string;
 
   constructor(private compilerService: CompilerService,
-              private qtumService: QtumService,
+              private htmlcoinService: HtmlcoinService,
               private terminalService: TerminalService) { }
 
 
@@ -68,7 +68,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
    */
 
   /**
-   * Load unspent transaction outputs from qtum testnet
+   * Load unspent transaction outputs from htmlcoin testnet
    * to be used for contract transactions
    */
   getUtxos(): void {
@@ -98,16 +98,16 @@ export class RunTabComponent implements OnInit, OnDestroy {
 
   /**
    * Returns the current selected contract as a formatted Contract object
-   * @return A Qtum Contract object with some extra fields
+   * @return A Htmlcoin Contract object with some extra fields
    */
-  currentQtumContract(): any {
-    // Create a qtumjs Contract object
-    const contract = new qtumjs.Contract(this.rpc, {
+  currentHtmlcoinContract(): any {
+    // Create a htmlcoinjs Contract object
+    const contract = new htmlcoinjs.Contract(this.rpc, {
       abi: this._selectedContract.abi,
       address: this._contractAddress
     });
 
-    // Make sure the Qtum.js Contract object has a name
+    // Make sure the Htmlcoin.js Contract object has a name
     contract.name = this._selectedContract.name;
     contract.expanded = true;
     contract.functions = contract.info.abi.filter((method: any) => {
@@ -126,7 +126,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
    * Deploys the selected contract
    */
   deploy(): void {
-    const contract = this.currentQtumContract();
+    const contract = this.currentHtmlcoinContract();
 
     const constructorArgs = (<any>this._selectedContract).constructorArgs;
     const args = constructorArgs ? constructorArgs.split(',') : [];
@@ -158,7 +158,7 @@ export class RunTabComponent implements OnInit, OnDestroy {
    * Loads a contract at the specified address
    */
   atAddress(): void {
-    const contract = this.currentQtumContract();
+    const contract = this.currentHtmlcoinContract();
     this.terminalService.log(`Loaded ${contract.name} @${contract.address}`);
     this._loadedContracts.push(contract);
   }
@@ -293,18 +293,18 @@ export class RunTabComponent implements OnInit, OnDestroy {
     return this.compilerService.contracts;
   }
 
-  // uses qtum js to connect to qtumrpc
+  // uses htmlcoin js to connect to htmlcoinrpc
 
   get rpc(): any {
-    return new qtumjs.QtumRPC(this.rpcUrl);
+    return new htmlcoinjs.HtmlcoinRPC(this.rpcUrl);
   }
 
   get rpcUrl(): string {
-    return this.qtumService.rpcUrl;
+    return this.htmlcoinService.rpcUrl;
   }
 
   set rpcUrl(rpcUrl: string) {
-    this.qtumService.rpcUrl = rpcUrl;
+    this.htmlcoinService.rpcUrl = rpcUrl;
   }
 
   get loadedContracts(): any[] {

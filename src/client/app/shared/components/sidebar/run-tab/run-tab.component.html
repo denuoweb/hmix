@@ -1,8 +1,8 @@
-<!-- URL to connect to qtum network defaults to testnet at localhost -->
+<!-- URL to connect to htmlcoin network defaults to testnet at localhost -->
 <div class="rpc-url-input">
   <div class="input-field">
-    <input id="qtum-rpc-url" name="qtum-rpc-url" type="text" [(ngModel)]="rpcUrl" (change)="getUnspent()">
-    <label for="qtum-rpc-url" class="active">Qtum RPC URL</label>
+    <input id="htmlcoin-rpc-url" name="htmlcoin-rpc-url" type="text" [(ngModel)]="rpcUrl" (change)="getUnspent()">
+    <label for="htmlcoin-rpc-url" class="active">Htmlcoin RPC URL</label>
   </div>
   <!-- loads and displays 10 UTXO's to use-->
   <div *ngIf="loadingUtxos" class="loading-indicator center-align">
